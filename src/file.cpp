@@ -13,15 +13,16 @@ std::string load_string(std::string path)
             std::string line;
             while (std::getline(file, line))
             {
-                data += line;
+                data += line + '\n';
             }
             file.close();
         }
-        return data;
     } else {
         std::cout << "Unable to open file." << std::endl;
-        return "NOT FOUND";
+        data = "NOT FOUND";
     }
+
+    return data;
 }
 
 int save_string(std::string path, std::string data)
