@@ -1,6 +1,6 @@
 #include "dependencies.hpp"
 
-std::string load(std::string path)
+std::string load_string(std::string path)
 {
     std::string data;
     std::fstream file;
