@@ -1,0 +1,1 @@
+g++ src\main.cpp src\file.cpp -o bin\ice.exe
