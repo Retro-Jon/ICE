@@ -3,6 +3,8 @@
 std::vector<Token> Lex(std::map<std::string, std::string> source_files)
 {
     std::vector<Token> tokens;
+    std::vector<std::string> variables;
+    std::vector<std::string> methods_functions = {"output", "input", "return"};
 
     for (std::pair<std::string, std::string> file : source_files)
     {
@@ -15,7 +17,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if (c == '"')
                 is_string = !is_string;
             
-            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '"') && is_string == false)
+            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false)
                 current += c;
             else if (is_string == true && c != '"')
                 current += c;
@@ -32,15 +34,45 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     type = METHOD;
                     current = "";
                 }
+                else if (current == "null")
+                {
+                    type = null;
+                    Token new_token;
+                    new_token.keyword = current;
+                    new_token.type = type;
+                    tokens.push_back(new_token);
+                    current = "";
+                    type = INSTRUCTION;
+                }
 
-                if (c == ';' || c == '\n' || c == '(' || c == ',' || c == ':')
+                if (c == ';' || c == '\n' || c == '(' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=')
                 {
                     if (current != "")
                     {
                         Token new_token;
                         new_token.keyword = current;
                         new_token.type = type;
+
+                        if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) == methods_functions.end() && new_token.type == INSTRUCTION)
+                            new_token.type = VALUE;
+
+                        if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) != methods_functions.end())
+                            new_token.type = CALL;
+                        else if (std::find(variables.begin(), variables.end(), new_token.keyword) != variables.end() && new_token.type != VARIABLE)
+                            new_token.type = REFERENCE;
+
                         tokens.push_back(new_token);
+                        switch (new_token.type)
+                        {
+                            case METHOD:
+                            case FUNCTION:
+                                methods_functions.push_back(new_token.keyword);
+                                break;
+                            case VARIABLE:
+                                variables.push_back(new_token.keyword);
+                            default:
+                                break;
+                        }
                     }
                     current = "";
                     type = INSTRUCTION;
@@ -67,11 +99,14 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         case '/':
                         case '=':
                         case '%':
-                            type = OPPERATOR;
+                            Token new_token;
+                            new_token.keyword = c;
+                            new_token.type = OPPERATOR;
+                            tokens.push_back(new_token);
+                            break;
                     }
                 }
             }
-            
         }
     }
     return tokens;

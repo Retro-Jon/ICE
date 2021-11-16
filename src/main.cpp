@@ -47,14 +47,42 @@ int main(int argc, char *argv[])
 
             for (Token t : tokens)
             {
-                if (t.type == INSTRUCTION) std::cout << "INSTRUCTION: ";
-                else if (t.type == LABEL) std::cout << "LABEL: ";
-                else if (t.type == FUNCTION) std::cout << "FUNCTION: ";
-                else if (t.type == METHOD) std::cout << "METHOD: ";
-                else if (t.type == VARIABLE) std::cout << "VARIABLE: ";
-                else if (t.type == DATA_TYPE) std::cout << "DATA_TYPE: ";
-                else if (t.type == OPPERATOR) std::cout << "OPPERATOR: ";
-                
+                switch (t.type)
+                {
+                    case INSTRUCTION:
+                        std::cout << "INSTRUCTION: ";
+                        break;
+                    case LABEL:
+                        std::cout << "LABEL: ";
+                        break;
+                    case FUNCTION:
+                        std::cout << "FUNCTION: ";
+                        break;
+                    case METHOD:
+                        std::cout << "METHOD: ";
+                        break;
+                    case VARIABLE:
+                        std::cout << "VARIABLE: ";
+                        break;
+                    case DATA_TYPE:
+                        std::cout << "DATA_TYPE: ";
+                        break;
+                    case OPPERATOR:
+                        std::cout << "OPPERATOR: ";
+                        break;
+                    case null:
+                        std::cout << "null: ";
+                        break;
+                    case VALUE:
+                        std::cout << "VALUE: ";
+                        break;
+                    case CALL:
+                        std::cout << "CALL: ";
+                        break;
+                    case REFERENCE:
+                        std::cout << "REFERENCE: ";
+                        break;
+                }
                 std::cout << t.keyword << std::endl;
             }
         }   

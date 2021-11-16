@@ -18,7 +18,11 @@ enum TokenType
     METHOD,
     VARIABLE,
     DATA_TYPE,
-    OPPERATOR
+    OPPERATOR,
+    null,
+    VALUE,
+    CALL,
+    REFERENCE
 };
 
 class Token

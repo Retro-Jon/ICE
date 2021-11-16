@@ -1,4 +1,4 @@
-Method print : void (msg)
+Method print : void ($msg)
 {
     output(msg, 0);
 }
@@ -7,7 +7,7 @@ Function text_in : char[50] (null)
 {
     $in : char[50];
     input(in, 0);
-    return in;
+    return(in);
 }
 
 Function main : int (null)
