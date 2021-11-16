@@ -10,4 +10,22 @@
 #include <algorithm>
 #include <iterator>
 
+enum TokenType
+{
+    INSTRUCTION,
+    LABEL,
+    FUNCTION,
+    METHOD,
+    VARIABLE,
+    DATA_TYPE,
+    OPPERATOR
+};
+
+class Token
+{
+    public:
+        int type;
+        std::string keyword;
+};
+
 #endif
