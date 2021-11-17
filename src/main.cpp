@@ -3,6 +3,8 @@
 #include "ice_functions.hpp"
 #include "file.hpp"
 
+bool dev_debug = true;
+
 int main(int argc, char *argv[])
 {
     std::map<std::string, std::string> source_files;
@@ -44,48 +46,57 @@ int main(int argc, char *argv[])
         {
             std::vector<Token> tokens;
             tokens = Lex(source_files);
-
-            for (Token t : tokens)
+            
+            if (dev_debug == true)
             {
-                switch (t.type)
+                for (Token t : tokens)
                 {
-                    case INSTRUCTION:
-                        std::cout << "INSTRUCTION: ";
-                        break;
-                    case LABEL:
-                        std::cout << "LABEL: ";
-                        break;
-                    case FUNCTION:
-                        std::cout << "FUNCTION: ";
-                        break;
-                    case METHOD:
-                        std::cout << "METHOD: ";
-                        break;
-                    case VARIABLE:
-                        std::cout << "VARIABLE: ";
-                        break;
-                    case DATA_TYPE:
-                        std::cout << "DATA_TYPE: ";
-                        break;
-                    case OPPERATOR:
-                        std::cout << "OPPERATOR: ";
-                        break;
-                    case null:
-                        std::cout << "null: ";
-                        break;
-                    case VALUE:
-                        std::cout << "VALUE: ";
-                        break;
-                    case CALL:
-                        std::cout << "CALL: ";
-                        break;
-                    case REFERENCE:
-                        std::cout << "REFERENCE: ";
-                        break;
+                    switch (t.type)
+                    {
+                        case INSTRUCTION:
+                            std::cout << "INSTRUCTION: ";
+                            break;
+                        case LABEL:
+                            std::cout << "LABEL: ";
+                            break;
+                        case FUNCTION:
+                            std::cout << "FUNCTION: ";
+                            break;
+                        case VARIABLE:
+                            std::cout << "VARIABLE: ";
+                            break;
+                        case DATA_TYPE:
+                            std::cout << "DATA_TYPE: ";
+                            break;
+                        case OPPERATOR:
+                            std::cout << "OPPERATOR: ";
+                            break;
+                        case null:
+                            std::cout << "null: ";
+                            break;
+                        case VALUE:
+                            std::cout << "VALUE: ";
+                            break;
+                        case CALL:
+                            std::cout << "CALL: ";
+                            break;
+                        case REFERENCE:
+                            std::cout << "REFERENCE: ";
+                            break;
+                        case END:
+                            std::cout << "END: ";
+                            break;
+                        case START:
+                            std::cout << "START: ";
+                            break;
+                    }
+                    std::cout << t.keyword << std::endl;
                 }
-                std::cout << t.keyword << std::endl;
             }
-        }   
+
+            std::cout << "\n-----------\n";
+            run(tokens, dev_debug);
+        }
     } else {
         std::cout << "NO INPUT" << std::endl;
     }

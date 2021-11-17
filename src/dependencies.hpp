@@ -15,14 +15,15 @@ enum TokenType
     INSTRUCTION,
     LABEL,
     FUNCTION,
-    METHOD,
     VARIABLE,
     DATA_TYPE,
     OPPERATOR,
     null,
     VALUE,
     CALL,
-    REFERENCE
+    REFERENCE,
+    START,
+    END
 };
 
 class Token
@@ -30,6 +31,14 @@ class Token
     public:
         int type;
         std::string keyword;
+};
+
+class Function
+{
+    public:
+        std::vector<Token> code;
+        std::string return_type;
+        std::vector<Token> args;
 };
 
 #endif

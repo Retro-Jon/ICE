@@ -29,11 +29,6 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     type = FUNCTION;
                     current = "";
                 }
-                else if (current == "Method")
-                {
-                    type = METHOD;
-                    current = "";
-                }
                 else if (current == "null")
                 {
                     type = null;
@@ -64,7 +59,6 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         tokens.push_back(new_token);
                         switch (new_token.type)
                         {
-                            case METHOD:
                             case FUNCTION:
                                 methods_functions.push_back(new_token.keyword);
                                 break;
@@ -99,11 +93,28 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         case '/':
                         case '=':
                         case '%':
+                        {
                             Token new_token;
                             new_token.keyword = c;
                             new_token.type = OPPERATOR;
                             tokens.push_back(new_token);
                             break;
+                        }
+                        case '}':
+                        {
+                            Token end;
+                            end.keyword = "END";
+                            end.type = END;
+                            tokens.push_back(end);
+                            break;
+                        }
+                        case '{':
+                        {
+                            Token start;
+                            start.keyword = "START";
+                            start.type = START;
+                            tokens.push_back(start);
+                        }
                     }
                 }
             }

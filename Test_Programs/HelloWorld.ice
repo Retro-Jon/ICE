@@ -1,21 +1,17 @@
-Method print : void ($msg)
+Function TestB : void (null)
 {
-    output(msg, 0);
+    @TEST_B;
 }
 
-Function text_in : char[50] (null)
+Function Test : void (null)
 {
-    $in : char[50];
-    input(in, 0);
-    return(in);
+    @Test_Start;
+    TestB();
+    @Test_End;
+    TestB();
 }
 
 Function main : int (null)
 {
-    @START
-    $message : char[11] = "Hello World!";
-    print(message);
-    print(text_in());
-    goto(START);
-    @END
+    Test();
 }
