@@ -28,8 +28,11 @@ int run(std::vector<Token> token_list, bool debug)
             if (in_code == true)
                 current_function.code.push_back(current);
             else if (in_code == false)
-                current_function.args.push_back(current);
-            
+            {
+                Variable arg;
+                current_function.args.insert(std::pair<std::string, Variable>(current.keyword, arg));
+            }
+
             if (current.type == FUNCTION)
                 current_function_name = current.keyword;
             else if (current.type == END)
@@ -78,7 +81,7 @@ int run(std::vector<Token> token_list, bool debug)
         int current_function_index = Function_Stack.size() - 1;
         Function current_function = functions[Function_Stack[current_function_index].name];
 
-        std::cout << "CURRENT_FUNCTION: " << Function_Stack[current_function_index].name << " : " << current_function_index << std::endl;
+        if (debug == true) std::cout << "CURRENT_FUNCTION: " << Function_Stack[current_function_index].name << " : " << current_function_index << std::endl;
 
         previous_function last_func_data;
         last_func_data.name = Function_Stack[current_function_index].name;
@@ -87,10 +90,34 @@ int run(std::vector<Token> token_list, bool debug)
         for (int code_index = last_func_data.code_index; code_index < current_function.code.size(); code_index++)
         {
             Token current_code = current_function.code[code_index];
-            std::cout << code_index << " : " << current_code.keyword << std::endl;
+            if (debug == true) std::cout << code_index << " : " << current_code.keyword << std::endl;
 
             switch (current_code.type)
             {
+                case VARIABLE:
+                {
+                    Variable new_variable;
+                    current_function.variables.insert(std::pair<std::string, Variable>(current_code.keyword, new_variable));
+                    break;
+                }
+                case DATA_TYPE:
+                {
+                    int t = 0;
+
+                    if (current_code.keyword == "void")
+                        t = 0;
+                    else if (current_code.keyword == "int")
+                        t = 1;
+                    else if (current_code.keyword == "float")
+                        t = 2;
+                    else if (current_code.keyword == "char")
+                        t = 3;
+                    else if (current_code.keyword == "string")
+                        t = 4;
+                    
+                    current_function.variables[current_function.variables.end()->first].type = t;
+                    break;
+                }
                 case CALL:
                 {
                     last_func_data.code_index = code_index + 1;
@@ -99,6 +126,11 @@ int run(std::vector<Token> token_list, bool debug)
                     previous_function new_func;
                     new_func.name = current_code.keyword;
                     new_func.code_index = 0;
+                    int arg_counter = 0;
+                    std::vector<std::string> arg_names;
+
+                    for (std::pair<std::string, Variable> arg : functions[new_func.name].args)
+                        arg_names.push_back(arg.first);
 
                     Function_Stack.push_back(new_func);
                     f++;
@@ -110,13 +142,29 @@ int run(std::vector<Token> token_list, bool debug)
                     Function_Stack.pop_back();
                     code_index = current_function.code.size();
                     break;
+                case INSTRUCTION:
+                {
+                    if (current_code.keyword == "output")
+                    {
+                        switch (std::stoi(current_function.code[code_index + 1].keyword))
+                        {
+                            case 0:
+                            {
+                                Token out;
+
+                                if (current_function.variables.count(current_function.code[code_index + 2].keyword) != 0)
+                                    out.keyword = current_function.variables[current_function.code[code_index + 2].keyword].string_value;
+
+                                std::cout << out.keyword << std::endl;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 
-    std::cout << "---------" << std::endl;
-
-    for (previous_function f : Function_Stack)
-        std::cout << "-" << f.name << std::endl;
+    if (debug == true) std::cout << "---------" << std::endl;
     return 0;
 }

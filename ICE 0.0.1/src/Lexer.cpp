@@ -4,7 +4,8 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
 {
     std::vector<Token> tokens;
     std::vector<std::string> variables;
-    std::vector<std::string> methods_functions = {"output", "input", "return"};
+    std::vector<std::string> methods_functions;
+    std::string instructions[] = {"output", "input", "return"};
 
     for (std::pair<std::string, std::string> file : source_files)
     {
@@ -47,15 +48,18 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         Token new_token;
                         new_token.keyword = current;
                         new_token.type = type;
+                        
+                        if (std::find(std::begin(instructions), std::end(instructions), new_token.keyword) == std::end(instructions))
+                        {
+                            if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) == methods_functions.end() && new_token.type == INSTRUCTION)
+                                new_token.type = VALUE;
 
-                        if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) == methods_functions.end() && new_token.type == INSTRUCTION)
-                            new_token.type = VALUE;
-
-                        if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) != methods_functions.end())
-                            new_token.type = CALL;
-                        else if (std::find(variables.begin(), variables.end(), new_token.keyword) != variables.end() && new_token.type != VARIABLE)
-                            new_token.type = REFERENCE;
-
+                            if (std::find(methods_functions.begin(), methods_functions.end(), new_token.keyword) != methods_functions.end())
+                                new_token.type = CALL;
+                            else if (std::find(variables.begin(), variables.end(), new_token.keyword) != variables.end() && new_token.type != VARIABLE)
+                                new_token.type = REFERENCE;
+                        }
+                        
                         tokens.push_back(new_token);
                         switch (new_token.type)
                         {

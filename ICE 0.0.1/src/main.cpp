@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            std::cout << "\n-----------\n";
+            if (dev_debug == true) std::cout << "\n-----------\n";
             run(tokens, dev_debug);
         }
     } else {

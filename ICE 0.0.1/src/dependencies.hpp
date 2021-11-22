@@ -26,6 +26,15 @@ enum TokenType
     END
 };
 
+enum DataType
+{
+    VOID,
+    INT,
+    FLOAT,
+    CHAR,
+    STRING
+};
+
 class Token
 {
     public:
@@ -33,12 +42,24 @@ class Token
         std::string keyword;
 };
 
+class Variable
+{
+    public:
+        int type = 0;
+        
+        int int_value;
+        float float_value;
+        char char_value;
+        std::string string_value;
+};
+
 class Function
 {
     public:
         std::vector<Token> code;
         std::string return_type;
-        std::vector<Token> args;
+        std::map<std::string, Variable> args;
+        std::map<std::string, Variable> variables;
 };
 
 #endif
