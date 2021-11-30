@@ -76,6 +76,7 @@ int run(std::vector<Token> token_list, bool debug)
                 case END:
                 {
                     in_function_code = false;
+                    // Store function name and function pair in functions map
                     functions.insert(std::pair<std::string, Function>(current_function_name, current_function));
                     current_function_name = "";
                     Function f;
@@ -112,6 +113,74 @@ int run(std::vector<Token> token_list, bool debug)
             std::cout << "\ncode:\n";
             for (Token t : f.second.code)
                 std::cout << t.keyword << std::endl;
+        }
+    }
+
+    if (debug == true) std::cout << "\nSTART EXECUTION\n" << std::endl;
+
+    struct Function_Stack_Data
+    {
+        std::string name;
+        int code_index;
+    };
+
+    std::vector<Function_Stack_Data> Function_Stack;
+    Function_Stack_Data main;
+    main.name = "main";
+    main.code_index = -1;
+    Function_Stack.push_back(main);
+
+    // Loop through Function_Stack
+
+    while (Function_Stack.size() > 0)
+    {
+        Function_Stack_Data current_function;
+        current_function = Function_Stack[Function_Stack.size() - 1];
+        std::cout << current_function.name << std::endl;
+
+        // Loop through current function code
+
+        for (int index = current_function.code_index; index < functions[current_function.name].code.size(); ++index)
+        {
+            Token current_instruction = functions[current_function.name].code[current_function.code_index];
+
+            if (debug == true)  std::cout << current_instruction.keyword << std::endl;
+
+            switch (current_instruction.type)
+            {
+                case INSTRUCTION:
+                {
+                    if (current_instruction.keyword == "output")
+                    {
+                        switch (std::stoi(functions[current_function.name].code[current_function.code_index + 1].keyword))
+                        {
+                        case 0:
+                            std::cout << functions[current_function.name].code[current_function.code_index + 2].keyword << std::endl;
+                            break;
+                        
+                        default:
+                            break;
+                        }
+                    }
+                    break;
+                }
+                case CALL:
+                {
+                    Function_Stack[Function_Stack.size() - 1].code_index = index;
+                    Function_Stack_Data new_function;
+                    new_function.name = current_instruction.keyword;
+                    new_function.code_index = -1;
+                    Function_Stack.push_back(new_function);
+                    break;
+                }
+                case END:
+                    Function_Stack.pop_back();
+                    index = functions[current_function.name].code.size() + 1;
+                    std::cout << "END" << std::endl;
+                    break;
+                default:
+                    break;
+            }
         }
     }
     return 0;
