@@ -55,11 +55,7 @@ int run(std::vector<Token> token_list, bool debug)
                 }
                 case VARIABLE:
                 {
-                    if (in_function_code = true)
-                    {
-                        Variable v;
-                        current_function.variables.insert(std::pair<std::string, Variable>(t.keyword, v));
-                    } else if (in_function_args == true)
+                    if (in_function_args == true)
                     {
                         Variable a;
                         current_function.args.insert(std::pair<std::string, Variable>(t.keyword, a));
@@ -104,7 +100,7 @@ int run(std::vector<Token> token_list, bool debug)
             std::cout << f.first << std::endl;
             std::cout << "\nargs:\n";
             for (std::pair<std::string, Variable> a : f.second.args)
-                std::cout << a.first << std::endl;
+                std::cout << a.first << " : " << a.second.type << std::endl;
             
             std::cout << "\nvariables:\n";
             for (std::pair<std::string, Variable> v : f.second.variables)
@@ -127,24 +123,27 @@ int run(std::vector<Token> token_list, bool debug)
     std::vector<Function_Stack_Data> Function_Stack;
     Function_Stack_Data main;
     main.name = "main";
-    main.code_index = -1;
+    main.code_index = 0;
     Function_Stack.push_back(main);
 
     // Loop through Function_Stack
 
     while (Function_Stack.size() > 0)
     {
-        Function_Stack_Data current_function;
-        current_function = Function_Stack[Function_Stack.size() - 1];
-        std::cout << current_function.name << std::endl;
+        Function_Stack_Data current_function = Function_Stack[Function_Stack.size() - 1];
+        int current_function_index = Function_Stack.size() - 1;
+        if (debug == true)
+        {
+            std::cout << "--" << current_function.name << "--" << std::endl;
+        }
 
         // Loop through current function code
 
         for (int index = current_function.code_index; index < functions[current_function.name].code.size(); ++index)
         {
-            Token current_instruction = functions[current_function.name].code[current_function.code_index];
+            Token current_instruction = functions[current_function.name].code[index];
 
-            if (debug == true)  std::cout << current_instruction.keyword << std::endl;
+            if (debug == true) std::cout << current_instruction.keyword << std::endl;
 
             switch (current_instruction.type)
             {
@@ -152,31 +151,75 @@ int run(std::vector<Token> token_list, bool debug)
                 {
                     if (current_instruction.keyword == "output")
                     {
-                        switch (std::stoi(functions[current_function.name].code[current_function.code_index + 1].keyword))
+                        switch (std::stoi(functions[current_function.name].code[index + 1].keyword))
                         {
-                        case 0:
-                            std::cout << functions[current_function.name].code[current_function.code_index + 2].keyword << std::endl;
-                            break;
-                        
-                        default:
-                            break;
+                            case 0:
+                                Function func;
+                                func = functions[current_function.name];
+                                std::string value = func.code[index + 2].keyword;
+
+                                // Check if value is a variable reference
+                                if (func.code[index + 2].type == REFERENCE)
+                                {
+                                    if (std::find(func.args_order.begin(), func.args_order.end(), value) != func.args_order.end())
+                                    { // Is function argument
+                                        switch (func.args[value].type)
+                                        {
+                                            case VOID:
+                                                value = "VOID";
+                                                break;
+                                            case INT:
+                                                value = std::to_string(func.args[value].int_value);
+                                                break;
+                                            case FLOAT:
+                                                value = std::to_string(func.args[value].float_value);
+                                                break;
+                                            case CHAR:
+                                                value = std::to_string(func.args[value].char_value);
+                                                break;
+                                            case STRING:
+                                                value = func.args[value].string_value;
+                                                break;
+                                        }
+                                    }
+                                }
+
+                                std::cout << value << std::endl;
+                                break;
                         }
                     }
                     break;
                 }
+                case VARIABLE:
+                {
+                    Variable v;
+                    functions[current_function.name].variables.insert(std::pair<std::string, Variable>(current_instruction.keyword, v));
+                }
                 case CALL:
                 {
-                    Function_Stack[Function_Stack.size() - 1].code_index = index;
+                    Function_Stack[Function_Stack.size() - 1].code_index = index + 1;
                     Function_Stack_Data new_function;
                     new_function.name = current_instruction.keyword;
-                    new_function.code_index = -1;
+                    new_function.code_index = 0;
                     Function_Stack.push_back(new_function);
+
+                    for (int arg = 0; arg < functions[current_instruction.keyword].args_order.size(); arg++)
+                    {
+                        Variable current_arg = functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]];
+                        Token value = functions[current_function.name].code[index + arg + 1];
+                        
+                        if (current_arg.type == INT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].int_value = std::stoi(value.keyword);
+                        else if (current_arg.type == FLOAT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].float_value = std::stof(value.keyword);
+                        else if (current_arg.type == CHAR) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].char_value = value.keyword[0];
+                        else if (current_arg.type == STRING) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].string_value = value.keyword;
+                    }
+
+                    index = functions[current_function.name].code.size();
                     break;
                 }
                 case END:
                     Function_Stack.pop_back();
-                    index = functions[current_function.name].code.size() + 1;
-                    std::cout << "END" << std::endl;
+                    index = functions[current_function.name].code.size();
                     break;
                 default:
                     break;
