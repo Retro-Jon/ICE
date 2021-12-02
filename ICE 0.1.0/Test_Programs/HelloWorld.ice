@@ -6,6 +6,15 @@ Function print : void ($f_out : string, $l_out : string)
 
 Function main : int (null)
 {
-    print("HelloWorld!", "Bye");
+    $msg : string;
+    msg = "HelloWorld";
+    
+    $msg2 : string;
+    msg2 = msg;
+
+    $msg3 : string;
+    msg3 = "BYE"
+    
+    print(msg2, msg3);
     return(0);
 }

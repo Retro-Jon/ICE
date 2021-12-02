@@ -17,12 +17,12 @@ int run(std::vector<Token> token_list, bool debug)
         bool in_function_args = false;
         Function current_function;
         std::string current_function_name = "";
-        std::string last_token_keyword = "";
+        Token last_token;
         int current_code_index = 0;
 
         for (Token t : token_list)
         {
-            if (t.type != FUNCTION && t.type != VARIABLE && t.type != DATA_TYPE && t.type != LABEL && t.type != null)
+            if ((t.type != FUNCTION && t.type != DATA_TYPE && t.type != LABEL && t.type != null) || (t.type == DATA_TYPE && in_function_code == true))
             {
                 current_function.code.push_back(t);
             }
@@ -49,7 +49,7 @@ int run(std::vector<Token> token_list, bool debug)
                     }
                     else if (in_function_args == true)
                     {
-                        current_function.args[last_token_keyword].type = type;
+                        current_function.args[last_token.keyword].type = type;
                     }
                     break;
                 }
@@ -86,7 +86,7 @@ int run(std::vector<Token> token_list, bool debug)
                 }
             }
 
-            last_token_keyword = t.keyword;
+            last_token = t;
         }
     }
 
@@ -147,6 +147,38 @@ int run(std::vector<Token> token_list, bool debug)
 
             switch (current_instruction.type)
             {
+                case OPPERATOR:
+                {
+                    if (current_instruction.keyword == "=")
+                    {
+                        Variable var = functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword];
+                        std::string value = functions[current_function.name].code[index + 1].keyword;
+
+                        if (functions[current_function.name].code[index + 1].type == REFERENCE)
+                        {
+                            if (var.type == STRING)
+                                value = functions[current_function.name].variables[value].string_value;
+                            else if (var.type == INT)
+                                value = std::to_string(functions[current_function.name].variables[value].int_value);
+                            else if (var.type == FLOAT)
+                                value = std::to_string(functions[current_function.name].variables[value].float_value);
+                            else if (var.type == CHAR)
+                                value = std::to_string(functions[current_function.name].variables[value].char_value);
+                        }
+
+                        if (var.type == STRING)
+                            var.string_value = value;
+                        else if (var.type == INT)
+                            var.int_value = std::stoi(value);
+                        else if (var.type == FLOAT)
+                            var.float_value = std::stof(value);
+                        else if (var.type == CHAR)
+                            var.char_value = value[0];
+                        
+                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword] = var;
+                    }
+                    break;
+                }
                 case INSTRUCTION:
                 {
                     if (current_instruction.keyword == "output")
@@ -195,6 +227,18 @@ int run(std::vector<Token> token_list, bool debug)
                     Variable v;
                     functions[current_function.name].variables.insert(std::pair<std::string, Variable>(current_instruction.keyword, v));
                 }
+                case DATA_TYPE:
+                {
+                    if (current_instruction.keyword == "int")
+                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword].type = INT;
+                    else if (current_instruction.keyword == "float")
+                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword].type = FLOAT;
+                    else if (current_instruction.keyword == "char")
+                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword].type = CHAR;
+                    else if (current_instruction.keyword == "string")
+                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword].type = STRING;
+                    break;
+                }
                 case CALL:
                 {
                     Function_Stack[Function_Stack.size() - 1].code_index = index + 1;
@@ -207,6 +251,20 @@ int run(std::vector<Token> token_list, bool debug)
                     {
                         Variable current_arg = functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]];
                         Token value = functions[current_function.name].code[index + arg + 1];
+                        
+                        if (value.type == REFERENCE)
+                        {
+                            Variable v = functions[current_function.name].variables[value.keyword];
+
+                            if (v.type == STRING)
+                                value.keyword = v.string_value;
+                            else if (v.type == INT)
+                                value.keyword = std::to_string(v.int_value);
+                            else if (v.type == FLOAT)
+                                value.keyword = std::to_string(v.float_value);
+                            else if (v.type == CHAR)
+                                value.keyword = std::to_string(v.char_value);
+                        }
                         
                         if (current_arg.type == INT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].int_value = std::stoi(value.keyword);
                         else if (current_arg.type == FLOAT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].float_value = std::stof(value.keyword);
