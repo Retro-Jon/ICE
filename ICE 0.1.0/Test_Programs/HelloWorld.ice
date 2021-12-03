@@ -1,12 +1,12 @@
 Function print : void ($text : string)
 {
-    output(0, text);
+    $o : string;
+    o = "asdf";
+    output(0, o);
 }
 
 Function main : int (void)
 {
-    $msg : string;
-    msg = "HelloWorld!";
-    print(msg);
+    print("TEST");
     return(0);
 }
