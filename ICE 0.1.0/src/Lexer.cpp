@@ -11,6 +11,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
     {
         std::string current;
         bool is_string = false;
+        bool in_comment = false;
         int type;
 
         for (char c : file.second)
@@ -18,12 +19,14 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if (c == '"')
                 is_string = !is_string;
             
-            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false)
+            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false)
                 current += c;
             else if (is_string == true && c != '"')
                 current += c;
+            else if (c == '#')
+                in_comment = !in_comment;
             
-            if (is_string == false)
+            if (is_string == false && in_comment == false)
             {
                 if (current == "Function")
                 {
