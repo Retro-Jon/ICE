@@ -1,2 +1,6 @@
 * linguist-vendored
 *.ice linguist-detectable=false
+*.cpp linguist-language=C++
+*.bat linguist-language=BATCH
+*.cpp linguist-detectable=true
+*.bat linguist-detectable=true
