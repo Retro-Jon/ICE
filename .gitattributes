@@ -1,2 +1,2 @@
 * linguist-vendored
-*.slice linguist-vendored=false
+*.ice linguist-vendored=false
