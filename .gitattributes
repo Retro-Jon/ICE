@@ -1,2 +1,4 @@
 * linguist-vendored
 *.ice linguist-language=ICE
+*.cpp linguist-language=C++
+*.bat linguist-language=BATCH
