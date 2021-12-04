@@ -3,7 +3,7 @@
 #include "ice_functions.hpp"
 #include "file.hpp"
 
-bool dev_debug = true;
+bool dev_debug = false;
 
 int main(int argc, char *argv[])
 {

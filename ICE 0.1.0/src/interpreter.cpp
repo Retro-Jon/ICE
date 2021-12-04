@@ -22,9 +22,10 @@ int run(std::vector<Token> token_list, bool debug)
 
         for (Token t : token_list)
         {
-            if ((t.type != FUNCTION && t.type != DATA_TYPE && t.type != LABEL && t.type != null) || (t.type == DATA_TYPE && in_function_code == true))
+            if ((t.type != FUNCTION && t.type != DATA_TYPE && t.type != LABEL && t.type != null) || (t.type == DATA_TYPE))
             {
-                current_function.code.push_back(t);
+                if (in_function_code == true)
+                    current_function.code.push_back(t);
             }
             switch(t.type)
             {
@@ -55,7 +56,7 @@ int run(std::vector<Token> token_list, bool debug)
                 }
                 case VARIABLE:
                 {
-                    if (in_function_args == true)
+                    if (in_function_args == true && in_function_code == false)
                     {
                         Variable a;
                         current_function.args.insert(std::pair<std::string, Variable>(t.keyword, a));
@@ -151,31 +152,38 @@ int run(std::vector<Token> token_list, bool debug)
                 {
                     if (current_instruction.keyword == "=")
                     {
-                        Variable var = functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword];
+                        std::string var_keyword = functions[current_function.name].code[index - 1].keyword;
+                        Variable var = functions[current_function.name].variables[var_keyword];
                         std::string value = functions[current_function.name].code[index + 1].keyword;
-
+                        
                         if (functions[current_function.name].code[index + 1].type == REFERENCE)
                         {
-                            if (var.type == STRING)
-                                value = functions[current_function.name].variables[value].string_value;
-                            else if (var.type == INT)
-                                value = std::to_string(functions[current_function.name].variables[value].int_value);
-                            else if (var.type == FLOAT)
-                                value = std::to_string(functions[current_function.name].variables[value].float_value);
-                            else if (var.type == CHAR)
-                                value = std::to_string(functions[current_function.name].variables[value].char_value);
+                            if (functions[current_function.name].has_variable(var_keyword))
+                            {
+                                if (functions[current_function.name].has_variable(value))
+                                {
+                                    var.set_to_variable(functions[current_function.name].variables[value]);
+                                    functions[current_function.name].variables[var_keyword] = var;
+                                } else if (functions[current_function.name].has_argument(value))
+                                {
+                                    var.set_to_variable(functions[current_function.name].args[value]);
+                                    functions[current_function.name].variables[var_keyword] = var;
+                                }
+                            }
+                            else if (functions[current_function.name].has_argument(var_keyword))
+                            {
+                                var.set_to_variable(functions[current_function.name].args[var_keyword]);
+                                functions[current_function.name].args[var_keyword] = var;
+                            }
                         }
-
-                        if (var.type == STRING)
-                            var.string_value = value;
-                        else if (var.type == INT)
-                            var.int_value = std::stoi(value);
-                        else if (var.type == FLOAT)
-                            var.float_value = std::stof(value);
-                        else if (var.type == CHAR)
-                            var.char_value = value[0];
-                        
-                        functions[current_function.name].variables[functions[current_function.name].code[index - 1].keyword] = var;
+                        else
+                        {
+                            if (functions[current_function.name].has_variable(var_keyword))
+                            {
+                                var.set_to_keyword(value);
+                                functions[current_function.name].variables[var_keyword] = var;
+                            }
+                        }
                     }
                     break;
                 }
@@ -188,35 +196,20 @@ int run(std::vector<Token> token_list, bool debug)
                             case 0:
                                 Function func;
                                 func = functions[current_function.name];
-                                std::string value = func.code[index + 2].keyword;
+                                std::string var = func.code[index + 2].keyword;
 
                                 // Check if value is a variable reference
                                 if (func.code[index + 2].type == REFERENCE)
                                 {
-                                    if (std::find(func.args_order.begin(), func.args_order.end(), value) != func.args_order.end())
+                                    if (func.has_argument(var))
                                     { // Is function argument
-                                        switch (func.args[value].type)
-                                        {
-                                            case VOID:
-                                                value = "VOID";
-                                                break;
-                                            case INT:
-                                                value = std::to_string(func.args[value].int_value);
-                                                break;
-                                            case FLOAT:
-                                                value = std::to_string(func.args[value].float_value);
-                                                break;
-                                            case CHAR:
-                                                value = std::to_string(func.args[value].char_value);
-                                                break;
-                                            case STRING:
-                                                value = func.args[value].string_value;
-                                                break;
-                                        }
+                                        std::cout << func.args[var].get_as_string() << std::endl;;
+                                    }
+                                    else if (func.has_variable(var))
+                                    {
+                                        std::cout << func.variables[var].get_as_string() << std::endl;
                                     }
                                 }
-
-                                std::cout << value << std::endl;
                                 break;
                         }
                     }
@@ -226,6 +219,7 @@ int run(std::vector<Token> token_list, bool debug)
                 {
                     Variable v;
                     functions[current_function.name].variables.insert(std::pair<std::string, Variable>(current_instruction.keyword, v));
+                    functions[current_function.name].variables_order.push_back(current_instruction.keyword);
                 }
                 case DATA_TYPE:
                 {
