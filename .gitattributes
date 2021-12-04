@@ -1,2 +1,2 @@
 * linguist-vendored
-*.ice linguist-lanuguage=ICE
+*.ice linguist-detectable=false
