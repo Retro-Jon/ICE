@@ -43,7 +43,7 @@ int run(std::vector<Token> token_list, bool debug)
                     else if (t.keyword == "char") type = CHAR;
                     else if (t.keyword == "string") type = STRING;
                     
-                    if (in_function_args == false)
+                    if (in_function_args == false && in_function_code == false)
                     {
                         current_function.return_type = type;
                         in_function_args = true;
@@ -77,6 +77,10 @@ int run(std::vector<Token> token_list, bool debug)
                     functions.insert(std::pair<std::string, Function>(current_function_name, current_function));
                     current_function_name = "";
                     Function f;
+                    f.args.clear();
+                    f.variables.clear();
+                    f.code.clear();
+                    f.labels.clear();
                     current_function = f;
                     break;
                 }
@@ -102,10 +106,6 @@ int run(std::vector<Token> token_list, bool debug)
             std::cout << "\nargs:\n";
             for (std::pair<std::string, Variable> a : f.second.args)
                 std::cout << a.first << " : " << a.second.type << std::endl;
-            
-            std::cout << "\nvariables:\n";
-            for (std::pair<std::string, Variable> v : f.second.variables)
-                std::cout << v.first << std::endl;
             
             std::cout << "\ncode:\n";
             for (Token t : f.second.code)
@@ -133,10 +133,8 @@ int run(std::vector<Token> token_list, bool debug)
     {
         Function_Stack_Data current_function = Function_Stack[Function_Stack.size() - 1];
         int current_function_index = Function_Stack.size() - 1;
-        if (debug == true)
-        {
-            std::cout << "--" << current_function.name << "--" << std::endl;
-        }
+
+        if (debug == true) std::cout << "--" << current_function.name << "--" << std::endl;
 
         // Loop through current function code
 
@@ -248,22 +246,18 @@ int run(std::vector<Token> token_list, bool debug)
                         
                         if (value.type == REFERENCE)
                         {
-                            Variable v = functions[current_function.name].variables[value.keyword];
-
-                            if (v.type == STRING)
-                                value.keyword = v.string_value;
-                            else if (v.type == INT)
-                                value.keyword = std::to_string(v.int_value);
-                            else if (v.type == FLOAT)
-                                value.keyword = std::to_string(v.float_value);
-                            else if (v.type == CHAR)
-                                value.keyword = std::to_string(v.char_value);
+                            if (functions[current_function.name].has_variable(value.keyword))
+                            {
+                                Variable v = functions[current_function.name].variables[value.keyword];
+                                value.keyword = v.get_as_string();
+                            } else if (functions[current_function.name].has_argument(value.keyword))
+                            {
+                                Variable a = functions[current_function.name].args[value.keyword];
+                                value.keyword = a.get_as_string();
+                            }
                         }
                         
-                        if (current_arg.type == INT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].int_value = std::stoi(value.keyword);
-                        else if (current_arg.type == FLOAT) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].float_value = std::stof(value.keyword);
-                        else if (current_arg.type == CHAR) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].char_value = value.keyword[0];
-                        else if (current_arg.type == STRING) functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].string_value = value.keyword;
+                        functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].set_to_keyword(value.keyword);
                     }
 
                     index = functions[current_function.name].code.size();

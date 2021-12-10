@@ -19,9 +19,9 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if (c == '"')
                 is_string = !is_string;
             
-            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false)
+            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
                 current += c;
-            else if (is_string == true && c != '"')
+            else if (is_string == true && c != '"' && in_comment == false)
                 current += c;
             else if (c == '#')
                 in_comment = !in_comment;
@@ -44,7 +44,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     type = INSTRUCTION;
                 }
 
-                if (c == ';' || c == '\n' || c == '(' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=')
+                if (c == ';' || c == '\n' || c == '(' || c == '{' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=')
                 {
                     if (current != "")
                     {
@@ -121,6 +121,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                             start.keyword = "START";
                             start.type = START;
                             tokens.push_back(start);
+                            break;
                         }
                     }
                 }
