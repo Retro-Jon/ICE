@@ -22,7 +22,7 @@ int run(std::vector<Token> token_list, bool debug)
 
         for (Token t : token_list)
         {
-            if ((t.type != FUNCTION && t.type != DATA_TYPE && t.type != LABEL && t.type != null) || (t.type == DATA_TYPE))
+            if ((t.type != FUNCTION && t.type != DATA_TYPE && t.type != LABEL && t.type != OPPERATOR && t.type != null) || (t.type == DATA_TYPE))
             {
                 if (in_function_code == true)
                     current_function.code.push_back(t);
@@ -89,9 +89,27 @@ int run(std::vector<Token> token_list, bool debug)
                     current_function.labels.insert(std::pair<std::string, int>(t.keyword, current_code_index));
                     break;
                 }
+                case OPPERATOR:
+                {
+                    if (in_function_code == true)
+                    {
+                        if (token_list[current_code_index + 1].type == OPPERATOR)
+                        {
+                            Token op;
+                            op.keyword = t.keyword + token_list[current_code_index + 1].keyword;
+                            op.type = OPPERATOR;
+                            current_function.code.push_back(op);
+                        }
+                        else if (token_list[current_code_index - 1].type != OPPERATOR)
+                        {
+                            current_function.code.push_back(t);
+                        }
+                    }
+                }
             }
 
             last_token = t;
+            current_code_index++;
         }
     }
 
@@ -182,6 +200,45 @@ int run(std::vector<Token> token_list, bool debug)
                                 functions[current_function.name].variables[var_keyword] = var;
                             }
                         }
+                    } else if (current_instruction.keyword == "+=")
+                    {
+                        std::string var_keyword = functions[current_function.name].code[index - 1].keyword;
+                        Variable var = functions[current_function.name].variables[var_keyword];
+                        std::string value = functions[current_function.name].code[index + 1].keyword;
+                        
+                        if (functions[current_function.name].code[index + 1].type == REFERENCE)
+                        {
+                            if (functions[current_function.name].has_variable(var_keyword))
+                            {
+                                if (functions[current_function.name].has_variable(value))
+                                {
+                                    std::string new_value = "";
+                                    std::string value1 = var.get_as_string();
+                                    std::string value2 = functions[current_function.name].variables[value].get_as_string();
+                                    switch (var.type)
+                                    {
+                                        case INT:
+                                            new_value = std::to_string(std::stoi(value1) + std::stoi(value2));
+                                            break;
+                                        case STRING:
+                                            new_value = value1 + value2;
+                                            break;
+                                    }
+                                    functions[current_function.name].variables[value].set_to_keyword(new_value);
+
+                                    var.set_to_variable(functions[current_function.name].variables[value]);
+                                    functions[current_function.name].variables[var_keyword] = var;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (functions[current_function.name].has_variable(var_keyword))
+                            {
+                                var.set_to_keyword(value);
+                                functions[current_function.name].variables[var_keyword] = var;
+                            }
+                        }
                     }
                     break;
                 }
@@ -206,6 +263,27 @@ int run(std::vector<Token> token_list, bool debug)
                                     else if (func.has_variable(var))
                                     {
                                         std::cout << func.variables[var].get_as_string() << std::endl;
+                                    }
+                                }
+                                break;
+                        }
+                    } else if (current_instruction.keyword == "input")
+                    {
+                        switch (std::stoi(functions[current_function.name].code[index + 1].keyword))
+                        {
+                            case 0:
+                                Function func;
+                                func = functions[current_function.name];
+                                std::string var = func.code[index + 2].keyword;
+
+                                // Check if value is a variable reference
+                                if (func.code[index + 2].type == REFERENCE)
+                                {
+                                    if (func.has_variable(var))
+                                    {
+                                        std::string data = "";
+                                        std::getline(std::cin, data);
+                                        functions[current_function.name].variables[var].set_to_keyword(data);
                                     }
                                 }
                                 break;
