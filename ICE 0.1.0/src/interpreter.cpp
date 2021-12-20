@@ -258,12 +258,16 @@ int run(std::vector<Token> token_list, bool debug)
                                 {
                                     if (func.has_argument(var))
                                     { // Is function argument
-                                        std::cout << func.args[var].get_as_string() << std::endl;;
+                                        std::cout << func.args[var].get_as_string();
                                     }
                                     else if (func.has_variable(var))
                                     {
-                                        std::cout << func.variables[var].get_as_string() << std::endl;
+                                        std::cout << func.variables[var].get_as_string();
                                     }
+                                }
+                                else // value is not a reference
+                                {
+                                    std::cout << var;
                                 }
                                 break;
                         }

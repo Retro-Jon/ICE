@@ -13,6 +13,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
         bool is_string = false;
         bool in_comment = false;
         int type;
+        bool escape_sequence = false;
 
         for (char c : file.second)
         {
@@ -22,7 +23,29 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
                 current += c;
             else if (is_string == true && c != '"' && in_comment == false)
-                current += c;
+            {
+                if (c == '\\' && escape_sequence == false)
+                    escape_sequence = true;
+                else if (escape_sequence == true)
+                {
+                    char seq;
+                    switch (c)
+                    {
+                        case 'n':
+                            seq = '\n';
+                            break;
+                        case '0':
+                            seq = '\0';
+                            break;
+                    }
+                    current += seq;
+                    escape_sequence = false;
+                }
+                else if (escape_sequence == false)
+                {
+                    current += c;
+                }
+            }
             else if (c == '#')
                 in_comment = !in_comment;
             
