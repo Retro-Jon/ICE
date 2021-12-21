@@ -84,7 +84,6 @@ class Variable
                 float_value = value.float_value;
                 char_value = value.char_value;
             }
-            
         }
 
         std::string get_as_string()

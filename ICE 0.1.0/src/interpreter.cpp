@@ -1,5 +1,19 @@
 #include "dependencies.hpp"
 
+struct Function_Stack_Data
+{
+    std::string name;
+    int code_index;
+};
+
+std::vector<Function_Stack_Data> Function_Stack;
+
+void error(std::string err)
+{
+    std::cout << "ERROR:\n" << err << "\n";
+    Function_Stack.clear();
+}
+
 int run(std::vector<Token> token_list, bool debug)
 {
     /*
@@ -119,31 +133,25 @@ int run(std::vector<Token> token_list, bool debug)
     {
         for (std::pair<std::string, Function> f : functions)
         {
-            std::cout << "------------------" << std::endl;
-            std::cout << f.first << std::endl;
+            std::cout << "------------------" << "\n";
+            std::cout << f.first << "\n";
             std::cout << "\nargs:\n";
             for (std::pair<std::string, Variable> a : f.second.args)
-                std::cout << a.first << " : " << a.second.type << std::endl;
+                std::cout << a.first << " : " << a.second.type << "\n";
             
             std::cout << "\ncode:\n";
             for (Token t : f.second.code)
-                std::cout << t.keyword << std::endl;
+                std::cout << t.keyword << "\n";
         }
     }
 
-    if (debug == true) std::cout << "\nSTART EXECUTION\n" << std::endl;
+    if (debug == true) std::cout << "\nSTART EXECUTION\n" << "\n";
 
-    struct Function_Stack_Data
-    {
-        std::string name;
-        int code_index;
-    };
-
-    std::vector<Function_Stack_Data> Function_Stack;
     Function_Stack_Data main;
     main.name = "main";
     main.code_index = 0;
     Function_Stack.push_back(main);
+    Variable Return_Value;
 
     // Loop through Function_Stack
 
@@ -152,7 +160,7 @@ int run(std::vector<Token> token_list, bool debug)
         Function_Stack_Data current_function = Function_Stack[Function_Stack.size() - 1];
         int current_function_index = Function_Stack.size() - 1;
 
-        if (debug == true) std::cout << "--" << current_function.name << "--" << std::endl;
+        if (debug == true) std::cout << "--" << current_function.name << "--\n";
 
         // Loop through current function code
 
@@ -160,84 +168,132 @@ int run(std::vector<Token> token_list, bool debug)
         {
             Token current_instruction = functions[current_function.name].code[index];
 
-            if (debug == true) std::cout << current_instruction.keyword << std::endl;
+            if (debug == true) std::cout << current_instruction.keyword << "\n";
 
             switch (current_instruction.type)
             {
                 case OPPERATOR:
                 {
+                    Token var = functions[current_function.name].code[index - 1];
+                    Token value = functions[current_function.name].code[index + 1];
+
+                    if (functions[current_function.name].code[index + 1].type == CALL)
+                    {
+                        if (Return_Value.type == VOID)
+                        {
+                            Function_Stack[Function_Stack.size() - 1].code_index = index;
+                            Function_Stack_Data new_function;
+                            new_function.name = functions[current_function.name].code[index + 1].keyword;
+                            new_function.code_index = 0;
+                            Function_Stack.push_back(new_function);
+
+                            for (int arg = 0; arg < functions[new_function.name].args_order.size(); arg++)
+                            {
+                                Token current_value = functions[current_function.name].code[index + arg + 2];
+
+                                if (current_value.type == REFERENCE)
+                                {
+                                    if (functions[current_function.name].has_variable(current_value.keyword))
+                                    {
+                                        current_value.keyword = functions[current_function.name].variables[current_value.keyword].get_as_string();
+                                    } else if (functions[current_function.name].has_argument(current_value.keyword))
+                                    {
+                                        current_value.keyword = functions[current_function.name].args[current_value.keyword].get_as_string();
+                                    }
+                                }
+                                
+                                functions[new_function.name].args[functions[new_function.name].args_order[arg]].set_to_keyword(current_value.keyword);
+                            }
+                            index = functions[current_function.name].code.size();
+                            break;
+                        } else {
+                            value.keyword = Return_Value.get_as_string();
+                        }
+                    }
                     if (current_instruction.keyword == "=")
                     {
-                        std::string var_keyword = functions[current_function.name].code[index - 1].keyword;
-                        Variable var = functions[current_function.name].variables[var_keyword];
-                        std::string value = functions[current_function.name].code[index + 1].keyword;
-                        
-                        if (functions[current_function.name].code[index + 1].type == REFERENCE)
+                        if (functions[current_function.name].has_variable(var.keyword))
                         {
-                            if (functions[current_function.name].has_variable(var_keyword))
+                            if (functions[current_function.name].code[index + 1].type == REFERENCE)
                             {
-                                if (functions[current_function.name].has_variable(value))
-                                {
-                                    var.set_to_variable(functions[current_function.name].variables[value]);
-                                    functions[current_function.name].variables[var_keyword] = var;
-                                } else if (functions[current_function.name].has_argument(value))
-                                {
-                                    var.set_to_variable(functions[current_function.name].args[value]);
-                                    functions[current_function.name].variables[var_keyword] = var;
-                                }
-                            }
-                            else if (functions[current_function.name].has_argument(var_keyword))
-                            {
-                                var.set_to_variable(functions[current_function.name].args[var_keyword]);
-                                functions[current_function.name].args[var_keyword] = var;
+                                if (functions[current_function.name].has_variable(value.keyword))
+                                    functions[current_function.name].variables[var.keyword].set_to_variable(functions[current_function.name].variables[value.keyword]);
+                                else if (functions[current_function.name].has_argument(value.keyword))
+                                    functions[current_function.name].variables[var.keyword].set_to_variable(functions[current_function.name].args[value.keyword]);
+                            } else {
+                                functions[current_function.name].variables[var.keyword].set_to_keyword(value.keyword);
                             }
                         }
-                        else
+                        else if (functions[current_function.name].has_argument(var.keyword))
                         {
-                            if (functions[current_function.name].has_variable(var_keyword))
-                            {
-                                var.set_to_keyword(value);
-                                functions[current_function.name].variables[var_keyword] = var;
-                            }
+                            // ICE ERROR HANDLING
+                            error("Cannot modify argument value: " + var.keyword + "; in Function: " + current_function.name);
+                            return 1;
                         }
                     } else if (current_instruction.keyword == "+=")
                     {
-                        std::string var_keyword = functions[current_function.name].code[index - 1].keyword;
-                        Variable var = functions[current_function.name].variables[var_keyword];
-                        std::string value = functions[current_function.name].code[index + 1].keyword;
-                        
-                        if (functions[current_function.name].code[index + 1].type == REFERENCE)
+                        if (functions[current_function.name].has_variable(var.keyword))
                         {
-                            if (functions[current_function.name].has_variable(var_keyword))
+                            std::string new_value = "";
+                            std::string value1 = functions[current_function.name].variables[var.keyword].get_as_string();
+                            std::string value2;
+                            
+                            if (functions[current_function.name].has_variable(value.keyword))
                             {
-                                if (functions[current_function.name].has_variable(value))
-                                {
-                                    std::string new_value = "";
-                                    std::string value1 = var.get_as_string();
-                                    std::string value2 = functions[current_function.name].variables[value].get_as_string();
-                                    switch (var.type)
-                                    {
-                                        case INT:
-                                            new_value = std::to_string(std::stoi(value1) + std::stoi(value2));
-                                            break;
-                                        case STRING:
-                                            new_value = value1 + value2;
-                                            break;
-                                    }
-                                    functions[current_function.name].variables[value].set_to_keyword(new_value);
+                                value2 = functions[current_function.name].variables[value.keyword].get_as_string();
+                            } else if (functions[current_function.name].has_argument(value.keyword))
+                            {
+                                value2 = functions[current_function.name].args[value.keyword].get_as_string();
+                            } else {
+                                value2 = value.keyword;
+                            }
 
-                                    var.set_to_variable(functions[current_function.name].variables[value]);
-                                    functions[current_function.name].variables[var_keyword] = var;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (functions[current_function.name].has_variable(var_keyword))
+                            switch (functions[current_function.name].variables[var.keyword].type)
                             {
-                                var.set_to_keyword(value);
-                                functions[current_function.name].variables[var_keyword] = var;
+                                case INT:
+                                    new_value = std::to_string(std::stoi(value1) + std::stoi(value2));
+                                    break;
+                                case FLOAT:
+                                    new_value = std::to_string(std::stof(value1) + std::stof(value2));
+                                    break;
+                                case STRING:
+                                    new_value = value1 + value2;
+                                    break;
                             }
+                            functions[current_function.name].variables[var.keyword].set_to_keyword(new_value);
+                        }
+                    } else if (current_instruction.keyword == "-=")
+                    {
+                        if (functions[current_function.name].has_variable(var.keyword))
+                        {
+                            std::string new_value = "";
+                            std::string value1 = functions[current_function.name].variables[var.keyword].get_as_string();
+                            std::string value2;
+                            
+                            if (functions[current_function.name].has_variable(value.keyword))
+                            {
+                                value2 = functions[current_function.name].variables[value.keyword].get_as_string();
+                            } else if (functions[current_function.name].has_argument(value.keyword))
+                            {
+                                value2 = functions[current_function.name].args[value.keyword].get_as_string();
+                            } else {
+                                value2 = value.keyword;
+                            }
+
+                            switch (functions[current_function.name].variables[var.keyword].type)
+                            {
+                                case INT:
+                                    new_value = std::to_string(std::stoi(value1) - std::stoi(value2));
+                                    break;
+                                case FLOAT:
+                                    new_value = std::to_string(std::stof(value1) - std::stof(value2));
+                                    break;
+                                case STRING:
+                                    // ICE ERROR HANDLING
+                                    error("Cannot subtract strings at: " + var.keyword + " " + current_instruction.keyword + " " + value.keyword + "; in Function: " + current_function.name);
+                                    return 1;
+                            }
+                            functions[current_function.name].variables[var.keyword].set_to_keyword(new_value);
                         }
                     }
                     break;
@@ -276,6 +332,7 @@ int run(std::vector<Token> token_list, bool debug)
                         switch (std::stoi(functions[current_function.name].code[index + 1].keyword))
                         {
                             case 0:
+                            {
                                 Function func;
                                 func = functions[current_function.name];
                                 std::string var = func.code[index + 2].keyword;
@@ -291,7 +348,21 @@ int run(std::vector<Token> token_list, bool debug)
                                     }
                                 }
                                 break;
+                            }
                         }
+                    } else if (current_instruction.keyword == "return")
+                    {
+                        Return_Value.type = functions[current_function.name].return_type;
+                        std::string r_keyword = functions[current_function.name].code[index + 1].keyword;
+
+                        if (functions[current_function.name].has_variable(r_keyword))
+                        {
+                            Return_Value.set_to_keyword(functions[current_function.name].variables[r_keyword].get_as_string());
+                        }
+                        else if (functions[current_function.name].has_argument(r_keyword))
+                            Return_Value.set_to_keyword(functions[current_function.name].args[r_keyword].get_as_string());
+                        else
+                            Return_Value.set_to_keyword(r_keyword);
                     }
                     break;
                 }
@@ -315,34 +386,38 @@ int run(std::vector<Token> token_list, bool debug)
                 }
                 case CALL:
                 {
-                    Function_Stack[Function_Stack.size() - 1].code_index = index + 1;
-                    Function_Stack_Data new_function;
-                    new_function.name = current_instruction.keyword;
-                    new_function.code_index = 0;
-                    Function_Stack.push_back(new_function);
-
-                    for (int arg = 0; arg < functions[current_instruction.keyword].args_order.size(); arg++)
+                    if (Return_Value.type == VOID)
                     {
-                        Variable current_arg = functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]];
-                        Token value = functions[current_function.name].code[index + arg + 1];
-                        
-                        if (value.type == REFERENCE)
-                        {
-                            if (functions[current_function.name].has_variable(value.keyword))
-                            {
-                                Variable v = functions[current_function.name].variables[value.keyword];
-                                value.keyword = v.get_as_string();
-                            } else if (functions[current_function.name].has_argument(value.keyword))
-                            {
-                                Variable a = functions[current_function.name].args[value.keyword];
-                                value.keyword = a.get_as_string();
-                            }
-                        }
-                        
-                        functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].set_to_keyword(value.keyword);
-                    }
+                        Function_Stack[Function_Stack.size() - 1].code_index = index + 1;
+                        Function_Stack_Data new_function;
+                        new_function.name = current_instruction.keyword;
+                        new_function.code_index = 0;
+                        Function_Stack.push_back(new_function);
 
-                    index = functions[current_function.name].code.size();
+                        for (int arg = 0; arg < functions[current_instruction.keyword].args_order.size(); arg++)
+                        {
+                            Variable current_arg = functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]];
+                            Token value = functions[current_function.name].code[index + arg + 1];
+                            
+                            if (value.type == REFERENCE)
+                            {
+                                if (functions[current_function.name].has_variable(value.keyword))
+                                {
+                                    Variable v = functions[current_function.name].variables[value.keyword];
+                                    value.keyword = v.get_as_string();
+                                } else if (functions[current_function.name].has_argument(value.keyword))
+                                {
+                                    Variable a = functions[current_function.name].args[value.keyword];
+                                    value.keyword = a.get_as_string();
+                                }
+                            }
+                            
+                            functions[new_function.name].args[functions[current_instruction.keyword].args_order[arg]].set_to_keyword(value.keyword);
+                        }
+                        index = functions[current_function.name].code.size();
+                    } else {
+                        Return_Value.type = VOID;
+                    }
                     break;
                 }
                 case END:
@@ -354,5 +429,11 @@ int run(std::vector<Token> token_list, bool debug)
             }
         }
     }
-    return 0;
+
+    if (Return_Value.type == INT)
+    {
+        return std::stoi(Return_Value.get_as_string());
+    }
+    else
+        return 0;
 }

@@ -7,6 +7,7 @@ bool dev_debug = false;
 
 int main(int argc, char *argv[])
 {
+    int exit_code = 0;
     std::map<std::string, std::string> source_files;
 
     if (argc >= 3)
@@ -95,10 +96,11 @@ int main(int argc, char *argv[])
             }
 
             if (dev_debug == true) std::cout << "\n-----------\n";
-            run(tokens, dev_debug);
+            exit_code = run(tokens, dev_debug);
         }
     } else {
         std::cout << "NO INPUT" << std::endl;
     }
-    return 0;
+
+    return exit_code;
 }
