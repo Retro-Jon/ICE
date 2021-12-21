@@ -177,7 +177,7 @@ int run(std::vector<Token> token_list, bool debug)
                     Token var = functions[current_function.name].code[index - 1];
                     Token value = functions[current_function.name].code[index + 1];
 
-                    if (functions[current_function.name].code[index + 1].type == CALL)
+                    if (value.type == CALL)
                     {
                         if (Return_Value.type == VOID)
                         {
