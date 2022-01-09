@@ -28,6 +28,10 @@ int main(int argc, char *argv[])
         {
             std::cout << _VERSION << std::endl;
         }
+        else if (std::strcmp(argv[1], "-f") == 0 || std::strcmp(argv[1], "-features") == 0)
+        {
+            std::cout << _FEATURES << std::endl;
+        }
     }
     else if (argc >= 3)
     {
