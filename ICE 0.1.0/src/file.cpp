@@ -18,7 +18,7 @@ std::string load_string(std::string path)
             file.close();
         }
     } else {
-        std::cout << "Unable to open file." << std::endl;
+        std::cout << "Unable to open file: " << path << std::endl;
         data = "NOT FOUND";
     }
 
@@ -39,7 +39,7 @@ int save_string(std::string path, std::string data)
         }
         return 0;
     } else {
-        std::cout << "Unable to open file." << std::endl;
+        std::cout << "Unable to open file: " << path << std::endl;
         return 1;
     }
 }

@@ -22,5 +22,5 @@ Function main : int (void)
     output(0, "\n");
     output(0, r);
     output(0, "\n");
-    return(1);
+    return(0);
 }

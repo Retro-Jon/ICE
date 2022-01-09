@@ -12,6 +12,8 @@ void error(std::string err)
 {
     std::cout << "ERROR:\n" << err << "\n";
     Function_Stack.clear();
+    std::vector<Function_Stack_Data> tmp;
+    Function_Stack.swap(tmp);
 }
 
 int run(std::vector<Token> token_list, bool debug)
@@ -127,6 +129,12 @@ int run(std::vector<Token> token_list, bool debug)
         }
     }
 
+    if (functions.size() == 0)
+    {
+        error("Functions not created.");
+        return 1;
+    }
+
     // List Functions
 
     if (debug == true)
@@ -160,7 +168,7 @@ int run(std::vector<Token> token_list, bool debug)
         Function_Stack_Data current_function = Function_Stack[Function_Stack.size() - 1];
         int current_function_index = Function_Stack.size() - 1;
 
-        if (debug == true) std::cout << "--" << current_function.name << "--\n";
+        //if (debug == true) std::cout << "--" << current_function.name << "--\n";
 
         // Loop through current function code
 
@@ -176,6 +184,12 @@ int run(std::vector<Token> token_list, bool debug)
                 {
                     Token var = functions[current_function.name].code[index - 1];
                     Token value = functions[current_function.name].code[index + 1];
+
+                    if (var.type == VALUE)
+                    {
+                        error("Can't modify a value: " + var.keyword + " in Function: " + current_function.name);
+                        return 1;
+                    }
 
                     if (value.type == CALL)
                     {
@@ -291,6 +305,72 @@ int run(std::vector<Token> token_list, bool debug)
                                 case STRING:
                                     // ICE ERROR HANDLING
                                     error("Cannot subtract strings at: " + var.keyword + " " + current_instruction.keyword + " " + value.keyword + "; in Function: " + current_function.name);
+                                    return 1;
+                            }
+                            functions[current_function.name].variables[var.keyword].set_to_keyword(new_value);
+                        }
+                    } else if (current_instruction.keyword == "*=")
+                    {
+                        if (functions[current_function.name].has_variable(var.keyword))
+                        {
+                            std::string new_value = "";
+                            std::string value1 = functions[current_function.name].variables[var.keyword].get_as_string();
+                            std::string value2;
+                            
+                            if (functions[current_function.name].has_variable(value.keyword))
+                            {
+                                value2 = functions[current_function.name].variables[value.keyword].get_as_string();
+                            } else if (functions[current_function.name].has_argument(value.keyword))
+                            {
+                                value2 = functions[current_function.name].args[value.keyword].get_as_string();
+                            } else {
+                                value2 = value.keyword;
+                            }
+
+                            switch (functions[current_function.name].variables[var.keyword].type)
+                            {
+                                case INT:
+                                    new_value = std::to_string(std::stoi(value1) * std::stoi(value2));
+                                    break;
+                                case FLOAT:
+                                    new_value = std::to_string(std::stof(value1) * std::stof(value2));
+                                    break;
+                                case STRING:
+                                    // ICE ERROR HANDLING
+                                    error("Cannot multiply strings at: " + var.keyword + " " + current_instruction.keyword + " " + value.keyword + "; in Function: " + current_function.name);
+                                    return 1;
+                            }
+                            functions[current_function.name].variables[var.keyword].set_to_keyword(new_value);
+                        }
+                    } else if (current_instruction.keyword == "/=")
+                    {
+                        if (functions[current_function.name].has_variable(var.keyword))
+                        {
+                            std::string new_value = "";
+                            std::string value1 = functions[current_function.name].variables[var.keyword].get_as_string();
+                            std::string value2;
+                            
+                            if (functions[current_function.name].has_variable(value.keyword))
+                            {
+                                value2 = functions[current_function.name].variables[value.keyword].get_as_string();
+                            } else if (functions[current_function.name].has_argument(value.keyword))
+                            {
+                                value2 = functions[current_function.name].args[value.keyword].get_as_string();
+                            } else {
+                                value2 = value.keyword;
+                            }
+
+                            switch (functions[current_function.name].variables[var.keyword].type)
+                            {
+                                case INT:
+                                    new_value = std::to_string(std::stoi(value1) / std::stoi(value2));
+                                    break;
+                                case FLOAT:
+                                    new_value = std::to_string(std::stof(value1) / std::stof(value2));
+                                    break;
+                                case STRING:
+                                    // ICE ERROR HANDLING
+                                    error("Cannot devide strings at: " + var.keyword + " " + current_instruction.keyword + " " + value.keyword + "; in Function: " + current_function.name);
                                     return 1;
                             }
                             functions[current_function.name].variables[var.keyword].set_to_keyword(new_value);
@@ -429,6 +509,9 @@ int run(std::vector<Token> token_list, bool debug)
             }
         }
     }
+
+    std::vector<Function_Stack_Data> tmp;
+    std::vector<Function_Stack_Data>().swap(tmp);
 
     if (Return_Value.type == INT)
     {

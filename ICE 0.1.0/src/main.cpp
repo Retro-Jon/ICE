@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         {
             std::vector<Token> tokens;
             tokens = Lex(source_files);
-            
+
             if (dev_debug == true)
             {
                 for (Token t : tokens)
@@ -96,10 +96,21 @@ int main(int argc, char *argv[])
             }
 
             if (dev_debug == true) std::cout << "\n-----------\n";
+
             exit_code = run(tokens, dev_debug);
+
+            std::vector<Token> tmp;
+            tokens.swap(tmp);
         }
     } else {
         std::cout << "NO INPUT" << std::endl;
+    }
+
+    switch (exit_code)
+    {
+        case 1:
+            std::cout << "EXIT ON ERROR\n";
+            break;
     }
 
     return exit_code;
