@@ -43,6 +43,8 @@ class Token
         std::string keyword;
 };
 
+bool evaluate_conditions(std::vector<Token> args);
+
 class Variable
 {
     public:

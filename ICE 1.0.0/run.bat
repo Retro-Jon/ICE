@@ -1,1 +1,1 @@
-bin\ice.exe -r ..\Test_Programs\HelloWorld.ice
+bin\ice.exe -r ..\Test_Programs\Conditions.ice
