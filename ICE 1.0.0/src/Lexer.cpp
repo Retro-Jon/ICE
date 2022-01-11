@@ -6,7 +6,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
     std::vector<Token> tokens;
     std::vector<std::string> variables;
     std::vector<std::string> methods_functions;
-    std::string instructions[] = {"output", "input", "return", "if", "else"};
+    std::string instructions[] = {"output", "input", "return", "if", "else", "goto"};
 
     std::vector<std::string> file_list;
     

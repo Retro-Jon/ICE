@@ -115,7 +115,7 @@ int run(std::vector<Token> token_list, bool debug)
                 }
                 case LABEL:
                 {
-                    current_function.labels.insert(std::pair<std::string, int>(t.keyword, current_code_index));
+                    current_function.labels.insert(std::pair<std::string, int>(t.keyword, current_function.code.size() - 1));
                     break;
                 }
                 case OPPERATOR:
@@ -526,6 +526,9 @@ int run(std::vector<Token> token_list, bool debug)
                                 Return_Value.set_to_keyword(functions[current_function.name].args[r_keyword].get_as_string());
                             else
                                 Return_Value.set_to_keyword(r_keyword);
+                        } else if (current_instruction.keyword == "goto")
+                        {
+                            index = functions[current_function.name].labels[functions[current_function.name].code[index + 1].keyword];
                         }
                         break;
                     }
@@ -587,7 +590,7 @@ int run(std::vector<Token> token_list, bool debug)
                     }
                     case END:
                     {
-                        if (nest_counter == 0)
+                        if (index == functions[current_function.name].code.size() - 1)
                         {
                             last_condition_result = true;
                             execute_change_index = 0;
