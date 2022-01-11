@@ -7,7 +7,7 @@ bool or_statement = false;
 bool is_num(std::string a)
 {   
     char c = a[0];
-    if(c >= '0' || c <= '9' || c == '-')
+    if((c >= '0' && c <= '9') || c == '-')
         return true;
 
     return false;
