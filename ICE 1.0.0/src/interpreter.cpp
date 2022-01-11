@@ -183,6 +183,7 @@ int run(std::vector<Token> token_list, bool debug)
         Function_Stack_Data current_function = Function_Stack[current_function_index];
         int nest_counter = current_function.nest_counter;
         bool execute = true;
+        bool last_condition_result = true;
 
         int execute_change_index = 0;
 
@@ -203,11 +204,16 @@ int run(std::vector<Token> token_list, bool debug)
             else if (current_instruction.type == END)
             {
                 nest_counter--;
+                if (execute_change_index == nest_counter)
+                {
+                    execute = true;
+                }
             }
 
-            if (execute == false)
+            if (current_instruction.type == INSTRUCTION && current_instruction.keyword == "else")
             {
-                //
+                execute_change_index = nest_counter;
+                execute = !last_condition_result;
             }
 
             if (execute == true)
@@ -466,21 +472,21 @@ int run(std::vector<Token> token_list, bool debug)
                                     break;
                                 }
                             }
-                        } else if (current_instruction.keyword == "else")
-                        {
-                            execute_change_index = nest_counter;
-                            execute = false;
                         } else if (current_instruction.keyword == "if")
                         {
                             std::vector<Token> conditions;
                             Token T;
                             int t_index = index + 1;
+                            T = functions[current_function.name].code[t_index];
 
                             while (T.type != START)
                             {
                                 T = functions[current_function.name].code[t_index];
+
                                 if (T.type != START)
+                                {
                                     conditions.push_back(T);
+                                }
                                 
                                 t_index++;
                             }
@@ -499,19 +505,13 @@ int run(std::vector<Token> token_list, bool debug)
                                     }
                                 }
                             }
+                            last_condition_result = evaluate_conditions(conditions);
 
-                            bool result = evaluate_conditions(conditions);
-
-                            /*
-                            if (result == false)
+                            if (last_condition_result == false)
                             {
-                                index = t_index + 1;
-                                execute_change_index = nest_counter - 1;
+                                execute_change_index = nest_counter;
                                 execute = false;
-                            } else if (result == true)
-                            {
-                                index = t_index - 1;
-                            }*/
+                            }
                         } else if (current_instruction.keyword == "return")
                         {
                             Return_Value.type = functions[current_function.name].return_type;
@@ -588,6 +588,8 @@ int run(std::vector<Token> token_list, bool debug)
                     {
                         if (nest_counter == 0)
                         {
+                            last_condition_result = true;
+                            execute_change_index = 0;
                             Function_Stack.pop_back();
                             index = functions[current_function.name].code.size();
                         }

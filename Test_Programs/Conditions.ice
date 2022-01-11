@@ -1,11 +1,20 @@
 Function main : int (void)
 {
-    if (true)
+    if (false)
     {
         output(0, "True\n");
     }
-
-    output(0, "end\n");
-
+    else
+    {
+        if (true)
+        {
+            output(0, "False\n");
+        }
+    }
+    if (false)
+    {
+        output(0, "SECOND\n");
+    }
+    output(0, "BREAK\n");
     return(0);
 }
