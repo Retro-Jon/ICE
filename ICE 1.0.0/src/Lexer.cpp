@@ -33,7 +33,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if (c == '"')
                 is_string = !is_string;
             
-            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '>' && c != '<' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
+            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '|' && c != '&' && c != '>' && c != '<' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
                 current += c;
             else if (is_string == true && c != '"' && in_comment == false)
             {
@@ -121,7 +121,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     type = INSTRUCTION;
                 }
 
-                if (c == ';' || c == '\n' || c == '(' || c == '{' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=')
+                if (c == ';' || c == '\n' || c == '(' || c == '{' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=' || c == '<' || c == '>' || c == '|' || c == '&')
                 {
                     if (current != "")
                     {
@@ -177,6 +177,10 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         case '/':
                         case '=':
                         case '%':
+                        case '>':
+                        case '<':
+                        case '|':
+                        case '&':
                         {
                             Token new_token;
                             new_token.keyword = c;

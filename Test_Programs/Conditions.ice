@@ -1,20 +1,18 @@
 Function main : int (void)
 {
-    if (false)
+    $a : int;
+    $b : int;
+    
+    output(0, "Enter 2 integers to compare:\n");
+    input(0, a);
+    input(0, b);
+    
+    if (a == b || b == 3 && a > b)
     {
-        output(0, "True\n");
+        output(0, "TRUE\n");
+    } else {
+        output(0, "FALSE\n");
     }
-    else
-    {
-        if (true)
-        {
-            output(0, "False\n");
-        }
-    }
-    if (false)
-    {
-        output(0, "SECOND\n");
-    }
-    output(0, "BREAK\n");
+
     return(0);
 }

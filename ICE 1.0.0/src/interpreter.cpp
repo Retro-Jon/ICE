@@ -128,6 +128,7 @@ int run(std::vector<Token> token_list, bool debug)
                             op.keyword = t.keyword + token_list[current_code_index + 1].keyword;
                             op.type = OPPERATOR;
                             current_function.code.push_back(op);
+                            token_list.erase(token_list.begin() + current_code_index + 1);
                         }
                         else if (token_list[current_code_index - 1].type != OPPERATOR)
                         {
@@ -225,7 +226,7 @@ int run(std::vector<Token> token_list, bool debug)
                         Token var = functions[current_function.name].code[index - 1];
                         Token value = functions[current_function.name].code[index + 1];
 
-                        if (var.type == VALUE)
+                        if (var.type == VALUE && current_instruction.keyword != "==" && current_instruction.keyword != "!=" && current_instruction.keyword != ">" && current_instruction.keyword != "<" && current_instruction.keyword != ">=" && current_instruction.keyword != "<=" && current_instruction.keyword != "&&" && current_instruction.keyword != "||")
                         {
                             error("Can't modify a value: " + var.keyword + " in Function: " + current_function.name);
                             return 1;
