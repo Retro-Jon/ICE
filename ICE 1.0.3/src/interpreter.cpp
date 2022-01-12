@@ -1,4 +1,5 @@
 #include "dependencies.hpp"
+#include "file.hpp"
 
 struct Function_Stack_Data
 {
@@ -425,30 +426,47 @@ int run(std::vector<Token> token_list, bool debug)
                     {
                         if (current_instruction.keyword == "output")
                         {
+                            Function func;
+                            func = functions[current_function.name];
+                            std::string var = func.code[index + 2].keyword;
+                            // Check if value is a variable reference
+                            if (func.code[index + 2].type == REFERENCE)
+                            {
+                                if (func.has_argument(var))
+                                { // Is function argument
+                                    var = func.args[var].get_as_string();
+                                }
+                                else if (func.has_variable(var))
+                                {
+                                    var = func.variables[var].get_as_string();
+                                }
+                            }
+
                             switch (std::stoi(functions[current_function.name].code[index + 1].keyword))
                             {
                                 case 0:
-                                    Function func;
-                                    func = functions[current_function.name];
-                                    std::string var = func.code[index + 2].keyword;
-
-                                    // Check if value is a variable reference
-                                    if (func.code[index + 2].type == REFERENCE)
-                                    {
-                                        if (func.has_argument(var))
-                                        { // Is function argument
-                                            std::cout << func.args[var].get_as_string();
-                                        }
-                                        else if (func.has_variable(var))
-                                        {
-                                            std::cout << func.variables[var].get_as_string();
-                                        }
-                                    }
-                                    else // value is not a reference
-                                    {
-                                        std::cout << var;
-                                    }
+                                {
+                                    std::cout << var;
                                     break;
+                                }
+                                case 1:
+                                {
+                                    std::string path = func.code[index + 3].keyword;
+                                    // Check if value is a variable reference
+                                    if (func.code[index + 3].type == REFERENCE)
+                                    {
+                                        if (func.has_argument(path))
+                                        { // Is function argument
+                                            path = func.args[path].get_as_string();
+                                        }
+                                        else if (func.has_variable(path))
+                                        {
+                                            path = func.variables[path].get_as_string();
+                                        }
+                                    }
+                                    save_string(path, var);
+                                    break;
+                                }
                             }
                         } else if (current_instruction.keyword == "input")
                         {
@@ -467,6 +485,38 @@ int run(std::vector<Token> token_list, bool debug)
                                         {
                                             std::string data = "";
                                             std::getline(std::cin, data);
+                                            functions[current_function.name].variables[var].set_to_keyword(data);
+                                        }
+                                    }
+                                    break;
+                                }
+                                case 1:
+                                {
+                                    Function func;
+                                    func = functions[current_function.name];
+                                    std::string var = func.code[index + 2].keyword;
+
+                                    std::string path = func.code[index + 3].keyword;
+                                    // Check if value is a variable reference
+                                    if (func.code[index + 3].type == REFERENCE)
+                                    {
+                                        if (func.has_argument(path))
+                                        { // Is function argument
+                                            path = func.args[path].get_as_string();
+                                        }
+                                        else if (func.has_variable(path))
+                                        {
+                                            path = func.variables[path].get_as_string();
+                                        }
+                                    }
+
+                                    // Check if value is a variable reference
+                                    if (func.code[index + 2].type == REFERENCE)
+                                    {
+                                        if (func.has_variable(var))
+                                        {
+                                            std::string data = "";
+                                            data = load_string(path);
                                             functions[current_function.name].variables[var].set_to_keyword(data);
                                         }
                                     }

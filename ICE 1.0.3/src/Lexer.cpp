@@ -41,17 +41,19 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     escape_sequence = true;
                 else if (escape_sequence == true)
                 {
-                    char seq;
                     switch (c)
                     {
                         case 'n':
-                            seq = '\n';
+                            current += '\n';
                             break;
                         case '0':
-                            seq = '\0';
+                            current += '\0';
+                            break;
+                        default:
+                            current += '\\';
+                            current += c;
                             break;
                     }
-                    current += seq;
                     escape_sequence = false;
                 }
                 else if (escape_sequence == false)
