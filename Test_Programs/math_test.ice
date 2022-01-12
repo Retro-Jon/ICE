@@ -1,4 +1,4 @@
-ICE Fetch Libs/math.ice;
+ICE Fetch Libs\math.ice;
 
 Function main : int (void)
 {

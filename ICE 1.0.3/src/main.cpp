@@ -1,5 +1,5 @@
 #include "dependencies.hpp"
-#include "..\ice_data.hpp"
+#include "../ice_data.hpp"
 #include "ice_functions.hpp"
 #include "file.hpp"
 

@@ -1,1 +1,1 @@
-bin\ice.exe -r ..\Test_Programs\Conditions.ice
+bin\ice.exe -r ..\Test_Programs\math_test.ice

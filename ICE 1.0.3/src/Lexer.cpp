@@ -33,7 +33,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
             if (c == '"')
                 is_string = !is_string;
             
-            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '|' && c != '&' && c != '>' && c != '<' && c != '+' && c != '-' && c != '*' && c != '/' && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
+            if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '|' && c != '&' && c != '>' && c != '<' && c != '+' && c != '-' && c != '*' && (c != '/' || ICE_FETCH) && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
                 current += c;
             else if (is_string == true && c != '"' && in_comment == false)
             {
@@ -79,7 +79,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
 
                         for (int dir_c = dir.size(); dir_c > 0; dir_c--)
                         {
-                            if (dir[dir_c] == '\\')
+                            if (dir[dir_c] == '\\' || dir[dir_c] == '/')
                                 break;
                             else
                             {
