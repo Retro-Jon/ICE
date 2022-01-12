@@ -1,1 +1,0 @@
-bin\ice.exe -r ..\Test_Programs\HelloWorld.ice
