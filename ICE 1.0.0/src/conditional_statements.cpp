@@ -5,22 +5,10 @@ bool and_statement = false;
 bool or_statement = false;
 
 bool is_num(std::string a)
-{
-    switch (a[0])
-    {
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case '-':
-            return true;
-    }
+{   
+    char c = a[0];
+    if((c >= '0' && c <= '9') || c == '-')
+        return true;
 
     return false;
 }

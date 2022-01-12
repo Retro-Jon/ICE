@@ -74,6 +74,9 @@ class Variable
                     case CHAR:
                         char_value = value[0];
                         break;
+                    default:
+                        std::cout << "DATA TYPE NOT SET\n";
+                        break;
                 }
             }
         }
