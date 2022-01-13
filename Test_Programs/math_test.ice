@@ -1,4 +1,4 @@
-ICE Fetch Libs\math.ice;
+ICE Fetch Libs/math.ice;
 
 Function main : int (void)
 {
@@ -21,6 +21,9 @@ Function main : int (void)
     
     result = div(in_a, in_b);
     print_result("division", result);
+
+    result = fact(in_a);
+    print_result("factorial", result);
 
     return(0);
 }
