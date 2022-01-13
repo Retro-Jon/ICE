@@ -50,10 +50,10 @@ class Variable
     public:
         int type = 0;
         
-        int int_value;
-        float float_value;
-        char char_value;
-        std::string string_value;
+        int int_value = 0;
+        float float_value = 0;
+        char char_value = ' ';
+        std::string string_value = "";
         bool CONSTANT = false;
 
         void set_to_keyword(std::string value)

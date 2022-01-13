@@ -222,7 +222,7 @@ int run(std::vector<Token> token_list, bool debug)
             {
                 switch (current_instruction.type)
                 {
-                    case OPPERATOR:
+                    case OPPERATOR: // += -= *= /= =
                     {
                         Token var = functions[current_function.name].code[index - 1];
                         Token value = functions[current_function.name].code[index + 1];

@@ -1,20 +1,15 @@
-Function save_string : void ($path : string, $data : string)
-{
-    output(1, data, path);
-}
-
-Function load_string : string ($path : string)
-{
-    $result : string;
-    input(1, result, path);
-    return result;
-}
+ICE Fetch Libs/io.ice;
 
 Function main : int (void)
 {
-    #save_string("test.txt", "IT WORKS!!!");#
+    $path : string;
     $contents : string;
-    contents = load_string("test.txt");
-    output(0, contents);
+
+    println("Where would you like to save your file?");
+    path = get_console_input();
+    println("Enter your message to save.");
+    contents = get_console_input();
+
+    save_string(path, contents);
     return(0);
 }
