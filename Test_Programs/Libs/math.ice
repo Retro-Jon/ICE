@@ -30,6 +30,28 @@ Function div : int ($a : int, $b : int)
     return(result);
 }
 
+Function fact : int ($a : int)
+{
+    $result : int;
+    $tmp : int;
+    $one : int;
+    one = 1;
+    tmp = a;
+    result = a;
+    @START_FACT;
+    tmp -= 1;
+    result *= tmp;
+    if( tmp > 1) {
+        goto("START_FACT");
+    }
+
+    if( a < 2 ) {
+        result = 1;
+    }
+
+    return(result);
+}
+
 Function print_result : void ($opperation : string, $value : int)
 {
     output(0, "- ");
