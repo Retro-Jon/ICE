@@ -99,8 +99,6 @@ int main(int argc, char *argv[])
                 }
             }
 
-            if (dev_debug == true) std::cout << "\n-----------\n";
-
             exit_code = run(tokens, dev_debug);
 
             std::vector<Token> tmp;

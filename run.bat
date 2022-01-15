@@ -1,1 +1,1 @@
-bin\ice.exe -r Test_Programs/file.ice
+bin\ice.exe -r Test_Programs/fact_tri_test.ice

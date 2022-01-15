@@ -13,18 +13,18 @@
 
 enum TokenType
 {
-    INSTRUCTION,
-    LABEL,
-    FUNCTION,
-    VARIABLE,
-    DATA_TYPE,
-    OPPERATOR,
-    null,
-    VALUE,
-    CALL,
-    REFERENCE,
-    START,
-    END
+    INSTRUCTION,    //  0
+    LABEL,          //  1
+    FUNCTION,       //  2
+    VARIABLE,       //  3
+    DATA_TYPE,      //  4
+    OPPERATOR,      //  5
+    null,           //  6
+    VALUE,          //  7
+    CALL,           //  8
+    REFERENCE,      //  9
+    START,          // 10
+    END             // 11
 };
 
 enum DataType
@@ -116,13 +116,16 @@ class Variable
 class Function
 {
     public:
-        std::vector<Token> code;
-        int return_type; // Enum DataType
-        std::map<std::string, Variable> args;
-        std::vector<std::string> args_order;
-        std::map<std::string, Variable> variables;
-        std::vector<std::string> variables_order;
-        std::map<std::string, int> labels;
+        std::vector<Token> code = {};
+        int return_type = VOID; // Enum DataType
+        std::map<std::string, Variable> args = {};
+        std::vector<std::string> args_order = {};
+        std::map<std::string, Variable> variables = {};
+        std::vector<std::string> variables_order = {};
+        std::map<std::string, int> labels = {};
+        int code_index = 0;
+        int nest_counter = 0;
+        std::string name = "";
 
         bool has_variable(std::string var_name)
         {
