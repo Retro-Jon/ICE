@@ -30,26 +30,20 @@ Function div : int ($a : int, $b : int)
     return(result);
 }
 
-Function fact : int ($a : int)
+Function fact : int ($n : int)
 {
-    $result : int;
-    $tmp : int;
-    $one : int;
-    one = 1;
-    tmp = a;
-    result = a;
-    @START_FACT;
-    tmp -= 1;
-    result *= tmp;
-    if( tmp > 1) {
-        goto("START_FACT");
+    if (n == 0)
+    {
+        return(1);
+    } else {
+        $new_n : int;
+        new_n = n;
+        new_n -= 1;
+        $res : int;
+        res = n;
+        res *= fact(new_n);
+        return(res);
     }
-
-    if( a < 2 ) {
-        result = 1;
-    }
-
-    return(result);
 }
 
 Function print_result : void ($opperation : string, $value : int)

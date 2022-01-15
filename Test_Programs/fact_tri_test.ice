@@ -2,16 +2,16 @@ ICE Fetch Libs/math.ice;
 
 Function tri : int ($x : int)
 {
-    $res : int;
-    $y : int;
     $acc : int;
-    if ( x == 0 )
+    if (x == 0 || x == 1)
     {
+        acc = x;
     } else {
+        $y : int;
         y = x;
         y -= 1;
+        acc = tri(y);
         acc += x;
-        res = tri(y);
     }
 
     return(acc);
