@@ -77,7 +77,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     {
                         std::string dir = current_file;
 
-                        for (int dir_c = dir.size(); dir_c > 0; dir_c--)
+                        for (int dir_c = dir.size(); dir_c >= 0; dir_c--)
                         {
                             if (dir[dir_c] == '\\' || dir[dir_c] == '/')
                                 break;

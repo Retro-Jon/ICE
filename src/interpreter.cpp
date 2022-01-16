@@ -517,6 +517,11 @@ int run(std::vector<Token> token_list, bool debug)
                             else
                                 Return_Value.set_to_keyword(r_keyword);
                             
+                            last_condition_result = true;
+                            execute_change_index = 0;
+                            Function_Stack.pop_back();
+                            current_code_index = Function_Stack[current_function_index].code.size();
+                            
                         } else if (current_instruction.keyword == "goto")
                         {
                             current_code_index = Function_Stack[current_function_index].labels[Function_Stack[current_function_index].code[current_code_index + 1].keyword];
