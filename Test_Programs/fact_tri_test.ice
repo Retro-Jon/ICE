@@ -1,22 +1,5 @@
 ICE Fetch Libs/math.ice;
 
-Function tri : int ($x : int)
-{
-    $acc : int;
-    if (x == 0 || x == 1)
-    {
-        acc = x;
-    } else {
-        $y : int;
-        y = x;
-        y -= 1;
-        acc = tri(y);
-        acc += x;
-    }
-
-    return(acc);
-}
-
 Function main : int (void)
 {
     $lp_c : int;

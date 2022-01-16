@@ -25,5 +25,8 @@ Function main : int (void)
     result = fact(in_a);
     print_result("factorial", result);
 
+    result = tri(in_a);
+    print_result("triangular", result);
+
     return(0);
 }

@@ -123,7 +123,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                     type = INSTRUCTION;
                 }
 
-                if (c == ';' || c == '\n' || c == '(' || c == '{' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=' || c == '<' || c == '>' || c == '|' || c == '&')
+                if (c == ';' || c == '\n' || c == '(' || c == '{' || c == '[' || c == ',' || c == ':' || c == '+' || c == '-' || c == '*' || c == '/' || c == '=' || c == '!' || c == '<' || c == '>' || c == '|' || c == '&')
                 {
                     if (current != "")
                     {
@@ -178,6 +178,7 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
                         case '*':
                         case '/':
                         case '=':
+                        case '!':
                         case '%':
                         case '>':
                         case '<':

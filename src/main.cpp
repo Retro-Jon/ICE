@@ -22,15 +22,15 @@ int main(int argc, char *argv[])
     {
         if (std::strcmp(argv[1], "-h") == 0 || std::strcmp(argv[1], "-help") == 0)
         {
-            std::cout << _HELP << std::endl;
+            std::cout << _HELP;
         }
         else if (std::strcmp(argv[1], "-v") == 0 || std::strcmp(argv[1], "-version") == 0)
         {
-            std::cout << _VERSION << std::endl;
+            std::cout << _VERSION;
         }
         else if (std::strcmp(argv[1], "-f") == 0 || std::strcmp(argv[1], "-features") == 0)
         {
-            std::cout << _FEATURES << std::endl;
+            std::cout << _FEATURES;
         }
     }
     else if (argc >= 3)
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
             tokens.swap(tmp);
         }
     } else {
-        std::cout << "NO INPUT" << std::endl;
+        std::cout << "NO INPUT\nType \"ice.exe -h\" for basic instructions.\n";
     }
 
     switch (exit_code)

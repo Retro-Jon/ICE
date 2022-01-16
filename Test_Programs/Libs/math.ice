@@ -30,12 +30,10 @@ Function div : int ($a : int, $b : int)
     return(result);
 }
 
-Function fact : int ($n : int)
+Function fact : int ($n : int) # Can't go beyond !12 because it exceeds the 64 bit integer length #
 {
-    if (n == 0)
+    if (n != 0)
     {
-        return(1);
-    } else {
         $new_n : int;
         new_n = n;
         new_n -= 1;
@@ -43,7 +41,26 @@ Function fact : int ($n : int)
         res = n;
         res *= fact(new_n);
         return(res);
+    } else {
+        return(1);
     }
+}
+
+Function tri : int ($x : int)
+{
+    $acc : int;
+    if (x == 0 || x == 1)
+    {
+        acc = x;
+    } else {
+        $y : int;
+        y = x;
+        y -= 1;
+        acc = tri(y);
+        acc += x;
+    }
+
+    return(acc);
 }
 
 Function print_result : void ($opperation : string, $value : int)

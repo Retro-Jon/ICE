@@ -61,6 +61,11 @@ bool evaluate_conditions(std::vector<Token> args)
                 if (args[t - 1].keyword == args[t + 1].keyword)
                     set_return_value(true);
                 else set_return_value(false);
+            } else if (current_arg.keyword == "!=")
+            {
+                if (args[t - 1].keyword != args[t + 1].keyword)
+                    set_return_value(true);
+                else set_return_value(false);
             } else if (is_num(args[t - 1].keyword) && is_num(args[t + 1].keyword))
             {
                 if (current_arg.keyword == ">")
