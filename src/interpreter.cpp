@@ -166,7 +166,8 @@ int run(std::vector<Token> token_list, bool debug)
     {
         int current_function_index = Function_Stack.size() - 1;
         bool execute = true;
-        bool last_condition_result = true;
+        bool last_if_condition_result = true;
+        bool last_elif_condition_result = false;
 
         int execute_change_index = 0;
 
@@ -177,8 +178,6 @@ int run(std::vector<Token> token_list, bool debug)
         for (int current_code_index = Function_Stack[current_function_index].code_index; current_code_index < Function_Stack[current_function_index].code.size(); ++current_code_index)
         {
             Token current_instruction = Function_Stack[current_function_index].code[current_code_index];
-
-            if (debug == true) std::cout << current_instruction.keyword << "\n";
 
             if (current_instruction.type == START)
             {
@@ -195,12 +194,63 @@ int run(std::vector<Token> token_list, bool debug)
 
             if (current_instruction.type == INSTRUCTION && current_instruction.keyword == "else")
             {
-                execute_change_index = Function_Stack[current_function_index].nest_counter;
-                execute = !last_condition_result;
+                if (last_if_condition_result == false && last_elif_condition_result == false && execute_change_index == Function_Stack[current_function_index].nest_counter)
+                {
+                    execute = true;
+                } else {
+                    execute = false;
+                }
+            } else if (current_instruction.type == INSTRUCTION && current_instruction.keyword == "elif")
+            {
+                if (last_if_condition_result == false && last_elif_condition_result == false && execute_change_index == Function_Stack[current_function_index].nest_counter)
+                {
+                    std::vector<Token> conditions;
+                    Token T;
+                    int t_index = current_code_index + 1;
+                    T = Function_Stack[current_function_index].code[t_index];
+
+                    while (T.type != START)
+                    {
+                        T = Function_Stack[current_function_index].code[t_index];
+
+                        if (T.type != START)
+                        {
+                            conditions.push_back(T);
+                        }
+                        
+                        t_index++;
+                    }
+
+                    for (int i = 0; i < conditions.size(); i++)
+                    {
+                        if (conditions[i].type == REFERENCE)
+                        {
+                            if (Function_Stack[current_function_index].has_variable(conditions[i].keyword))
+                            {
+                                conditions[i].keyword = Function_Stack[current_function_index].variables[conditions[i].keyword].get_as_string();
+                            }
+                            else if (Function_Stack[current_function_index].has_argument(conditions[i].keyword))
+                            {
+                                conditions[i].keyword = Function_Stack[current_function_index].args[conditions[i].keyword].get_as_string();
+                            }
+                        }
+                    }
+                    last_elif_condition_result = evaluate_conditions(conditions);
+
+                    if (last_elif_condition_result == false)
+                    {
+                        execute_change_index = Function_Stack[current_function_index].nest_counter;
+                        execute = false;
+                    }
+                } else {
+                    execute = false;
+                }
             }
 
             if (execute == true)
             {
+                if (debug == true) std::cout << current_instruction.keyword << "\n";
+
                 switch (current_instruction.type)
                 {
                     case OPPERATOR: // += -= *= /= =
@@ -496,9 +546,9 @@ int run(std::vector<Token> token_list, bool debug)
                                     }
                                 }
                             }
-                            last_condition_result = evaluate_conditions(conditions);
+                            last_if_condition_result = evaluate_conditions(conditions);
 
-                            if (last_condition_result == false)
+                            if (last_if_condition_result == false)
                             {
                                 execute_change_index = Function_Stack[current_function_index].nest_counter;
                                 execute = false;
@@ -517,7 +567,7 @@ int run(std::vector<Token> token_list, bool debug)
                             else
                                 Return_Value.set_to_keyword(r_keyword);
                             
-                            last_condition_result = true;
+                            last_if_condition_result = true;
                             execute_change_index = 0;
                             Function_Stack.pop_back();
                             current_code_index = Function_Stack[current_function_index].code.size();
@@ -584,7 +634,7 @@ int run(std::vector<Token> token_list, bool debug)
                     {
                         if (current_code_index == Function_Stack[current_function_index].code.size() - 1)
                         {
-                            last_condition_result = true;
+                            last_if_condition_result = true;
                             execute_change_index = 0;
                             Function_Stack.pop_back();
                             current_code_index = Function_Stack[current_function_index].code.size();

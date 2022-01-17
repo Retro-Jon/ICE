@@ -123,6 +123,7 @@ class Function
         std::map<std::string, Variable> variables = {};
         std::vector<std::string> variables_order = {};
         std::map<std::string, int> labels = {};
+
         int code_index = 0;
         int nest_counter = 0;
         std::string name = "";
