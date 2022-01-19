@@ -31,7 +31,19 @@ std::vector<Token> Lex(std::map<std::string, std::string> source_files)
         for (char c : source_files[current_file])
         {
             if (c == '"')
+            {
                 is_string = !is_string;
+                if (is_string == false)
+                {
+                    if (current == "")
+                    {
+                        Token new_token;
+                        new_token.keyword = current;
+                        new_token.type = STRING;
+                        tokens.push_back(new_token);
+                    }
+                }
+            }
             
             if ((c != ' ' && c != '\n' && c != '@' && c != '!' && c != '$' && c != '#' && c != '|' && c != '&' && c != '>' && c != '<' && c != '+' && c != '-' && c != '*' && (c != '/' || ICE_FETCH) && c != '=' && c != ',' && c != ':' && c != ';' && c != '(' && c != ')' && c != '{' && c != '}' && c != '[' && c != ']' && c != '"') && is_string == false && in_comment == false)
                 current += c;
