@@ -71,6 +71,7 @@ int run(std::vector<Token> token_list, bool debug)
                     if (in_function_args == true && in_function_code == false)
                     {
                         Variable a;
+                        a.name = t.keyword;
                         current_function.args.insert(std::pair<std::string, Variable>(t.keyword, a));
                         current_function.args_order.push_back(t.keyword);
                     }
@@ -477,6 +478,7 @@ int run(std::vector<Token> token_list, bool debug)
                                         {
                                             std::string data = "";
                                             std::getline(std::cin, data);
+                                            std::cin.clear();
                                             Function_Stack[current_function_index].variables[var].set_to_keyword(data);
                                         }
                                     }
@@ -553,6 +555,7 @@ int run(std::vector<Token> token_list, bool debug)
                                 execute_change_index = Function_Stack[current_function_index].nest_counter;
                                 execute = false;
                             }
+
                         } else if (current_instruction.keyword == "return")
                         {
                             Return_Value.type = Function_Stack[current_function_index].return_type;
@@ -581,19 +584,20 @@ int run(std::vector<Token> token_list, bool debug)
                     case VARIABLE:
                     {
                         Variable v;
+                        v.name = current_instruction.keyword;
                         Function_Stack[current_function_index].variables[current_instruction.keyword] = v;
                         Function_Stack[current_function_index].variables_order.push_back(current_instruction.keyword);
                     }
                     case DATA_TYPE:
                     {
                         if (current_instruction.keyword == "int")
-                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].type = INT;
+                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].set_type(INT);
                         else if (current_instruction.keyword == "float")
-                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].type = FLOAT;
+                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].set_type(FLOAT);
                         else if (current_instruction.keyword == "char")
-                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].type = CHAR;
+                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].set_type(CHAR);
                         else if (current_instruction.keyword == "string")
-                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].type = STRING;
+                            Function_Stack[current_function_index].variables[Function_Stack[current_function_index].code[current_code_index - 1].keyword].set_type(STRING);
                         break;
                     }
                     case CALL:

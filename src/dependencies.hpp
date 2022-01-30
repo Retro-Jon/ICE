@@ -56,6 +56,18 @@ class Variable
         std::string string_value = "";
         bool CONSTANT = false;
 
+        std::string name = "";
+
+        void set_type(int t)
+        {
+            type = t;
+        }
+
+        int get_type()
+        {
+            return type;
+        }
+
         void set_to_keyword(std::string value)
         {
             if (CONSTANT == false)
@@ -75,7 +87,7 @@ class Variable
                         char_value = value[0];
                         break;
                     default:
-                        std::cout << "DATA TYPE NOT SET\n";
+                        std::cout << name << ": DATA TYPE NOT SET\n";
                         break;
                 }
             }
