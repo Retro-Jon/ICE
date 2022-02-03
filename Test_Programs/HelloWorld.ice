@@ -6,6 +6,6 @@ Function main : int (void)
 {
     $msg : string; # declare a variable called "msg" with type "string" #
     msg = "HelloWorld!\n"; # set msg to the value "HelloWorld!" #
-    print(msg); # call the print function, passing msg a an argument #
+    print(msg); # call the print function, passing msg an argument #
     return(0); # return 0 to the interpreter (Executed without errors)#
 }

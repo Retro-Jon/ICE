@@ -29,11 +29,11 @@ enum TokenType
 
 enum DataType
 {
-    VOID,
-    INT,
-    FLOAT,
-    CHAR,
-    STRING
+    VOID = 0,
+    INT = 1,
+    FLOAT = 2,
+    CHAR = 3,
+    STRING = 4
 };
 
 class Token
@@ -48,7 +48,7 @@ bool evaluate_conditions(std::vector<Token> args);
 class Variable
 {
     public:
-        int type = 0;
+        int type = VOID;
         
         int int_value = 0;
         float float_value = 0;

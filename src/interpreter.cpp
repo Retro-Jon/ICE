@@ -55,14 +55,14 @@ int run(std::vector<Token> token_list, bool debug)
                     else if (t.keyword == "char") type = CHAR;
                     else if (t.keyword == "string") type = STRING;
                     
-                    if (in_function_args == false && in_function_code == false)
+                    if (in_function_args == false && last_token.type == FUNCTION)
                     {
                         current_function.return_type = type;
                         in_function_args = true;
                     }
-                    else if (in_function_args == true)
+                    else if (in_function_args == true && last_token.type != FUNCTION)
                     {
-                        current_function.args[last_token.keyword].type = type;
+                        current_function.args[last_token.keyword].set_type(type);
                     }
                     break;
                 }
@@ -71,7 +71,6 @@ int run(std::vector<Token> token_list, bool debug)
                     if (in_function_args == true && in_function_code == false)
                     {
                         Variable a;
-                        a.name = t.keyword;
                         current_function.args.insert(std::pair<std::string, Variable>(t.keyword, a));
                         current_function.args_order.push_back(t.keyword);
                     }
@@ -160,6 +159,7 @@ int run(std::vector<Token> token_list, bool debug)
 
     Function_Stack.push_back(functions["main"]);
     Variable Return_Value;
+    Return_Value.name = "Return_Value";
 
     // Loop through Function_Stack
 
@@ -558,7 +558,7 @@ int run(std::vector<Token> token_list, bool debug)
 
                         } else if (current_instruction.keyword == "return")
                         {
-                            Return_Value.type = Function_Stack[current_function_index].return_type;
+                            Return_Value.set_type(Function_Stack[current_function_index].return_type);
                             std::string r_keyword = Function_Stack[current_function_index].code[current_code_index + 1].keyword;
 
                             if (Function_Stack[current_function_index].has_variable(r_keyword))
@@ -587,6 +587,7 @@ int run(std::vector<Token> token_list, bool debug)
                         v.name = current_instruction.keyword;
                         Function_Stack[current_function_index].variables[current_instruction.keyword] = v;
                         Function_Stack[current_function_index].variables_order.push_back(current_instruction.keyword);
+                        break;
                     }
                     case DATA_TYPE:
                     {
