@@ -190,6 +190,10 @@ int run(std::vector<Token> token_list, bool debug)
                 if (execute_change_index == Function_Stack[current_function_index].nest_counter)
                 {
                     execute = true;
+                    /*if (Function_Stack[current_function_index].code[current_code_index + 1].keyword != "else" && Function_Stack[current_function_index].code[current_code_index + 1].keyword != "elif")
+                    {
+                        last_elif_condition_result = false;
+                    }*/
                 }
             }
 

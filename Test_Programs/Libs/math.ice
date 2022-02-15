@@ -71,3 +71,12 @@ Function print_result : void ($opperation : string, $value : int)
     output(0, value);
     output(0, "\n");
 }
+
+Function fib : int ($n : int)
+{
+    $n_1 : int;
+    $n_2 : int;
+
+    @START;
+    
+}
