@@ -49,18 +49,18 @@ Function fact : int ($n : int) # Can't go beyond !12 because it exceeds the 64 b
 Function tri : int ($x : int)
 {
     $acc : int;
-    if (x == 0 || x == 1)
+    
+    if (x <= 1)
     {
-        acc = x;
+        return(x);
     } else {
         $y : int;
         y = x;
         y -= 1;
         acc = tri(y);
         acc += x;
+        return(acc);
     }
-
-    return(acc);
 }
 
 Function print_result : void ($opperation : string, $value : int)

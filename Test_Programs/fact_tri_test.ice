@@ -8,7 +8,7 @@ Function main : int (void)
     output(0, "\nFactorials\n\n");
 
     @FACT_START;
-    if (lp_c <= 20)
+    if (lp_c <= 12)
     {
         $r : int;
         r = fact(lp_c);
@@ -25,7 +25,7 @@ Function main : int (void)
     output(0, "\ntri_sequence\n\n");
 
     @TRI_START;
-    if (lp_c <= 20)
+    if (lp_c <= 100)
     {
         $r : int;
         r = tri(lp_c);
