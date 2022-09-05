@@ -4,8 +4,11 @@ An interpreted programming language
 
 # Compiling the Interpreter
 
+Run build.bat (Makefile will be added soon)
+
 Uses Mingw-w64
-Should work with other compilers if they support the following libraries:
+
+Should work with other versions of Mingw if they support the following libraries:
 1. vector
 
 # Basics
@@ -24,7 +27,7 @@ $(variable_name) - declare variable
 
 # Function Declaration
 
-Function main : int (null)
+Function main : int (void)
 {
   return(0); # return 0 #
 }
@@ -36,7 +39,7 @@ Function print : void ($text)
   output(0, text);
 }
 
-Function main : int (null)
+Function main : int (void)
 {
   print("HelloWorld!");
   return(0);
